@@ -1,0 +1,21 @@
+.tab_item.active {
+  color: #ddedd1;
+
+  p {
+    color: #ddedd1;
+  }
+  svg {
+    color: #ddedd1;
+  }
+}
+svg {
+  color: #fff;
+}
+
+.tab_item:hover{
+
+ svg {
+  color: #ddedd1 !important;
+}
+
+}
