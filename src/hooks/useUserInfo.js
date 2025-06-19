@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { useLogout } from "./useLogout";
+import { useNavigate } from "react-router-dom";
 
 export default function useUserInfo() {
   const [cookies, removeCookie] = useCookies(["auth_token"]);
@@ -11,6 +12,7 @@ export default function useUserInfo() {
 
   const refreshUserInfo = ()=> setVersion((v)=> v+1)
 const logout = useLogout()
+const navigate = useNavigate()
   useEffect(() => {
     const getUserInfo = async () => {
       try {
@@ -25,7 +27,7 @@ const logout = useLogout()
 
         if (response.status === 498 || response.status === 403 ) {
           logout()
-          window.location.replace("/auth");
+          navigate('auth')
           return;
         }
 

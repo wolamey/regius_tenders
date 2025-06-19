@@ -3,13 +3,14 @@ import { useState } from "react";
 import "./Auth.scss";
 import ErrorPopup from "../../Components/ErrorPopup/ErrorPopup";
 import Loader from "../../Components/Loader/Loader";
-import { data } from "react-router-dom";
+import { data, Link, useNavigate } from "react-router-dom";
 import InputText from "../../Components/InputText/InputText";
 import { useCookies } from "react-cookie";
 export default function Auth() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
   const [cookies, setCookie] = useCookies(["auth_token", "user_email"]);
   const handleSubmit = async (e) => {
     setLoading(true);
@@ -33,8 +34,7 @@ export default function Auth() {
       const data = await response.json();
       if (response.ok) {
         setCookie("auth_token", data.access_token, { path: "/", maxAge: 3600 });
-
-        window.location.href = "/";
+navigate('/')
       } else {
         setError("Ошибка авторизации: " + data.detail);
       }
@@ -79,12 +79,12 @@ export default function Auth() {
             type="submit"
             className="button auth_submit w-fit m-auto pl-[40px] pr-[40px] pt-[20px] pb-[20px] bg-[#93A188] border-2  border-transparent cursor-pointer rounded-md text-white uppercase text-xl hover:bg-transparent hover:border-2 hover:border-[#93A188] hover:text-[#93A188]"
           />
-          <a
-            href="/register"
+          <Link
+            to="/register"
             className="button auth_register text-center text-[#93A188] underline hover:text-black"
           >
             Зарегистрироваться
-          </a>
+          </Link>
         </form>
       </div>
     </div>

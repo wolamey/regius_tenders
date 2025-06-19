@@ -12,6 +12,7 @@ import { useLogout } from "../../hooks/useLogout";
 import workImg from "/imgs/work.webp";
 import InfoPopup from "../../Components/InfoPopup/InfoPopup";
 import GetReasonModal from "./Components/GetReasonModal/GetReasonModal";
+import { Link } from "react-router-dom";
 export default function Home() {
   const [error, setError] = useState("");
   const [cookies, removeCookie] = useCookies(["auth_token"]);
@@ -211,13 +212,13 @@ export default function Home() {
                     {item.name}
                   </p>
 
-                  <a
-                    href={item.link}
+                  <Link
+                    to={item.link}
                     className="flex gap-[5px] text-[#646D5C] "
                   >
                     <img src={linkSvg} alt="" className="w-[15px] " />
                     {item.link}
-                  </a>
+                  </Link>
                 </div>
 
                 <div

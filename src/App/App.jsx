@@ -6,10 +6,10 @@ import Layout from "../Components/Layout/Layout";
 import Home from "../Pages/Home/Home";
 import { CookiesProvider } from "react-cookie";
 import Settings from "../Pages/Settings/Settings";
-
+import { HashRouter } from 'react-router-dom';
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <CookiesProvider>
         <div className="app">
           <Routes>
@@ -34,7 +34,7 @@ function App() {
           </Routes>
         </div>
       </CookiesProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

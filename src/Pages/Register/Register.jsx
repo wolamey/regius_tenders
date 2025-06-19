@@ -4,11 +4,12 @@ import InputText from "../../Components/InputText/InputText";
 import ErrorPopup from "../../Components/ErrorPopup/ErrorPopup";
 import Loader from "../../Components/Loader/Loader";
 import { useCookies } from "react-cookie";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Register() {
   const [error, setError] = useState("");
   const [cookies, setCookie] = useCookies(["auth_token", "user_email"]);
-
+const navigate = useNavigate()
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     company_name: "",
@@ -37,8 +38,7 @@ export default function Register() {
       const data = await response.json();
       if (response.ok) {
         setCookie("auth_token", data.access_token, { path: "/", maxAge: 3600 });
-
-        window.location.href = "/";
+navigate('/')
       } else {
         setError("Ошибка регистрации: " + data.detail);
       }
@@ -112,12 +112,12 @@ export default function Register() {
             className="button auth_submit w-fit m-auto pl-[40px] pr-[40px] pt-[20px] pb-[20px] bg-[#93A188] border-2  border-transparent cursor-pointer rounded-md text-white uppercase text-xl hover:bg-transparent hover:border-2 hover:border-[#93A188] hover:text-[#93A188]"
           />
 
-          <a
-            href="/auth"
+          <Link
+            to="/auth"
             className="button auth_register text-center text-[#93A188] underline hover:text-black"
           >
             Войти
-          </a>
+          </Link>
         </form>
       </div>
     </div>

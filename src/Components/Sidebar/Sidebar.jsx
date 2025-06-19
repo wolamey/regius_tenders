@@ -1,6 +1,7 @@
 import React from "react";
 import "./Sidebar.scss";
 import icon1 from "../../assets/images/sidebarIcon1.svg";
+import { Link, useLocation } from "react-router-dom";
 export default function Sidebar({ pageName }) {
   const tabs = [
     {
@@ -84,16 +85,17 @@ export default function Sidebar({ pageName }) {
     },
   
   ];
-  const path = '/' + window.location.pathname.split("/").pop();
-
+const location = useLocation();
+console.log(location.pathname);
+const path = location.pathname;
   return (
     <div className="h-screen bg-[#646D5C]  p-[20px] min-w-[30vh]">
       <p className="text-3xl text-white mb-[40px]">{pageName}</p>
 
       <div className="flex flex-col gap-[10px]">
         {tabs.map((item, index) => (
-          <a
-            href={item.link}
+          <Link
+            to={item.link}
             className={`${
               path === item.link ? "active  bg-[#77826E] " : ""
             }tab_item rounded-lg group flex gap-[12px] items-center p-[10px] peer  `}
@@ -103,7 +105,7 @@ export default function Sidebar({ pageName }) {
             <p className="text-white text-[18px] group-hover:text-[#DDEDD1]">
               {item.name}
             </p>
-          </a>
+          </Link>
         ))}
       </div>
     </div>
