@@ -3,7 +3,7 @@ import { useCookies } from "react-cookie";
 import ErrorPopup from "../../../../Components/ErrorPopup/ErrorPopup";
 import InfoPopup from "../../../../Components/InfoPopup/InfoPopup";
 import { useLogout } from "../../../../hooks/useLogout";
-export default function GetReasonModal({ tenderID, setUnsuitableID }) {
+export default function GetReasonModal({ tenderID, setUnsuitableID ,getTenders}) {
   const [reasonText, setReasonText] = useState("");
   const [cookies] = useCookies(["auth_token"]);
   const [error, setError] = useState("");
@@ -37,8 +37,9 @@ export default function GetReasonModal({ tenderID, setUnsuitableID }) {
       return;
     }
     if (response.ok) {
-      setWatchInfoPopup(true); // ← включаем “наблюдение”
+      setWatchInfoPopup(true); 
       setInfoPopupText(data.message || "");
+      getTenders()
     }
 
     console.log(data);
@@ -52,7 +53,7 @@ export default function GetReasonModal({ tenderID, setUnsuitableID }) {
   }, [infoPopupText, watchInfoPopup]);
 
   return (
-    <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-999 h-screen flex ">
+    <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-999999999 h-screen flex ">
       {error !== "" && <ErrorPopup errText={error} setError={setError} />}
 
       {infoPopupText !== "" && (

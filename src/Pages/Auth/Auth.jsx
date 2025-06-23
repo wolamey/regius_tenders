@@ -16,8 +16,6 @@ export default function Auth() {
     setLoading(true);
 
     e.preventDefault();
-    setCookie("user_email", formData.email, { path: "/", maxAge: 3600 });
-    // document.cookie = `user_email=${formData.email}`;
     console.log(formData);
     try {
       const response = await fetch(

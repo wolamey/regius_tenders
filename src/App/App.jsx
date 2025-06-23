@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import Auth from "../Pages/Auth/Auth";
 import Register from "../Pages/Register/Register";
 import Layout from "../Components/Layout/Layout";
@@ -8,8 +8,11 @@ import { CookiesProvider } from "react-cookie";
 import Settings from "../Pages/Settings/Settings";
 import { HashRouter } from 'react-router-dom';
 function App() {
+
+
+
   return (
-    <HashRouter>
+    <BrowserRouter basename="/regius_tenders/">
       <CookiesProvider>
         <div className="app">
           <Routes>
@@ -34,7 +37,7 @@ function App() {
           </Routes>
         </div>
       </CookiesProvider>
-    </HashRouter>
+    </BrowserRouter>
   );
 }
 

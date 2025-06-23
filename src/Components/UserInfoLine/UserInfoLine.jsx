@@ -9,7 +9,7 @@ export default function UserInfoLine() {
   if (error) setError(error);
 
   return (
-    <div className="bg-[#f6fcf2] p-[20px] w-full flex justify-between items-center shadow-2xl/7">
+    <div className="bg-[#f6fcf2] p-[20px] w-full flex justify-between items-center shadow-2xl/7 z-99999">
       <div className=""></div>
       {error !== "" && <ErrorPopup errText={error} setError={setError} />}
       {userInfo ? (

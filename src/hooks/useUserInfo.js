@@ -27,7 +27,7 @@ const navigate = useNavigate()
 
         if (response.status === 498 || response.status === 403 ) {
           logout()
-          navigate('auth')
+          navigate('/auth')
           return;
         }
 

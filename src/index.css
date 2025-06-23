@@ -31,3 +31,11 @@ input{
   box-shadow: inset 0 0 500px #646d5ca6;
   border-radius:  20px ;
 }
+.item-button-svg{
+  color: #646D5C;
+}
+
+.button-suitable.active .item-button-svg{
+  color: #F6FCF2;
+  
+}

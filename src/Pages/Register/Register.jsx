@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Register() {
   const [error, setError] = useState("");
   const [cookies, setCookie] = useCookies(["auth_token", "user_email"]);
-const navigate = useNavigate()
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     company_name: "",
@@ -37,8 +37,8 @@ const navigate = useNavigate()
       );
       const data = await response.json();
       if (response.ok) {
-        setCookie("auth_token", data.access_token, { path: "/", maxAge: 3600 });
-navigate('/')
+        // setCookie("auth_token", data.access_token, { path: "/", maxAge: 3600 });
+        navigate("/");
       } else {
         setError("Ошибка регистрации: " + data.detail);
       }
