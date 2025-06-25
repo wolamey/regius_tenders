@@ -16,7 +16,7 @@ export default function Auth() {
     setLoading(true);
 
     e.preventDefault();
-    console.log(formData);
+    // console.log(formData);
     try {
       const response = await fetch(
         "https://tenderstest.dev.regiuslab.by/v1/user/login",

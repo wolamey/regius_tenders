@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import ErrorPopup from "../../Components/ErrorPopup/ErrorPopup";
 import Loader from "../../Components/Loader/Loader";
@@ -12,6 +12,7 @@ import WorkImg from "../../assets/images/work.svg?react";
 import InfoPopup from "../../Components/InfoPopup/InfoPopup";
 import GetReasonModal from "./Components/GetReasonModal/GetReasonModal";
 import { Link } from "react-router-dom";
+import LotsWrap from "./Components/LotsWrap/LotsWrap";
 export default function Home() {
   const [error, setError] = useState("");
   const [cookies] = useCookies(["auth_token"]);
@@ -25,8 +26,14 @@ export default function Home() {
   const [userStatustes, setUserStatuses] = useState(null);
   const [platformStatustes, setPlatformStatuses] = useState(null);
   const [tendersLoader, setTendersLoader] = useState(false);
+
+  
+
+
   const logout = useLogout();
-  const getTenders = async () => {
+
+
+const getTenders = async () => {
     setTendersLoader(true);
     const params = new URLSearchParams({});
 
@@ -36,9 +43,7 @@ export default function Home() {
     if (filters.platform !== "") {
       params.set("platform_status", filters.platform);
     }
-    // if (filters.filter !== "") {
-    //   params.set("platform", filters.filter);
-    // }
+   
     try {
       const response = await fetch(
         `https://tenderstest.dev.regiuslab.by/v1/user/tenders?${params}`,
@@ -69,7 +74,7 @@ export default function Home() {
     } finally {
       setTimeout(() => {
         setTendersLoader(false);
-      }, 300); // 300ms, чтобы дать время рендеру
+      }, 300); 
     }
   };
 
@@ -77,10 +82,11 @@ export default function Home() {
     getTenders();
   }, [filters]);
 
+
   const copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      console.log("скопировано");
+      // console.log("скопировано");
     } catch (err) {
       console.error(err);
     }
@@ -138,7 +144,7 @@ export default function Home() {
       setInfoPopupText(data.message);
       getTenders();
     }
-    console.log(data);
+    // console.log(data);
   };
 
   const MarkAsTakenIntoWork = async (tenderID) => {
@@ -155,7 +161,7 @@ export default function Home() {
       );
 
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
 
       if (response.status === 403) {
         logout();
@@ -235,6 +241,13 @@ export default function Home() {
       platform: "",
     });
   };
+
+
+
+
+
+
+  
   return (
     <div className="flex flex-col ">
       {infoPopupText !== "" && (
@@ -249,7 +262,7 @@ export default function Home() {
       )}
       {error !== "" && <ErrorPopup errText={error} setError={setError} />}
 
-      <div className="flex flex-col  gap-[20px] pr-[20px]  pl-[20px]  pb-[20px] sticky top-0 z-9999 bg-[#DBEBCF] ">
+         <div className="flex flex-col  gap-[20px] pr-[20px]  pl-[20px]  pb-[20px] sticky top-0 z-9999 bg-[#DBEBCF] ">
         <div className="grid grid-cols-[1fr_1fr]  gap-[20px]">
           <div className="flex flex-col gap-[5px]">
             <p>Пользовательский статус</p>
@@ -331,6 +344,7 @@ export default function Home() {
         </button>
       </div>
 
+
       <div className="flex flex-col gap-[30px] p-[20px]">
         {tendersLoader ? (
           <div className="m-auto">
@@ -410,7 +424,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-[2fr_3fr] gap-[30px] items-center">
+              <div className="grid grid-cols-[2fr_3fr] gap-[30px] items-end">
                 <div className="grid grid-cols-[auto_3fr] gap-[10px_25px] items-center">
                   <p className="text-xs text-black/60">Платформа:</p>
                   <p className="">{item.platform.name}</p>
@@ -456,17 +470,21 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
-
-                <div className="flex gap-[10px] flex-wrap bg-white p-[20px] rounded-2xl">
-                  {item.lots.map((lot) => (
-                    <div
-                      className="bg-[#DDEDD1] p-[3px_15px] rounded-2xl"
-                      key={lot.id}
-                    >
-                      {lot.name}
-                    </div>
-                  ))}
-                </div>
+  <LotsWrap lots={item.lots} index={index} />
+                {/* <div className="lots-wrap bg-white p-[20px] rounded-2xl  overflow-hidden relative">
+                  <div className="absolute bottom-0 bg-fade-white h-[70px] w-full"></div>
+                  <p className="text-2xl mb-[20px]">Лоты: {item.lots.length}</p>
+                  <div className="flex gap-[10px] flex-wrap ">
+                    {item.lots.map((lot) => (
+                      <div
+                        className="bg-[#DDEDD1] p-[3px_15px] rounded-2xl"
+                        key={lot.id}
+                      >
+                        {lot.name}
+                      </div>
+                    ))}
+                  </div>
+                </div> */}
               </div>
             </div>
           ))

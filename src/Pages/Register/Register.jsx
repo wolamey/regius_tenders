@@ -22,7 +22,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     setLoading(true);
     e.preventDefault();
-    console.log(formData);
+    // console.log(formData);
     try {
       const response = await fetch(
         "https://tenderstest.dev.regiuslab.by/v1/user/register",

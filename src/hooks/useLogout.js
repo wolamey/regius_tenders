@@ -6,6 +6,7 @@ export function useLogout(){
     const [,removeCookie] = useCookies(['auth_token'])
     return useCallback(()=>{
         removeCookie('auth_token', {path:'/'})
+        removeCookie('auth_token', {path:'/regius_tenders'})
         navigate('/auth');
     }, [removeCookie])
 }

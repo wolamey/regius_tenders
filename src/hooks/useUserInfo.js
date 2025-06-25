@@ -1,11 +1,10 @@
-// src/hooks/useUserInfo.js
 import { useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { useLogout } from "./useLogout";
 import { useNavigate } from "react-router-dom";
 
 export default function useUserInfo() {
-  const [cookies, removeCookie] = useCookies(["auth_token"]);
+  const [cookies] = useCookies(["auth_token"]);
   const [userInfo, setUserInfo] = useState(null);
   const [error, setError] = useState("");
   const [version, setVersion] = useState(0)
@@ -24,10 +23,9 @@ const navigate = useNavigate()
         });
 
         const data = await response.json();
-
+// console.log(data)
         if (response.status === 498 || response.status === 403 ) {
           logout()
-          navigate('/auth')
           return;
         }
 
@@ -42,7 +40,7 @@ const navigate = useNavigate()
     };
 
     getUserInfo();
-  }, [cookies.auth_token, removeCookie,  version]);
+  }, [cookies.auth_token,   version]);
 
   return { userInfo, error, setError, refreshUserInfo };
 }

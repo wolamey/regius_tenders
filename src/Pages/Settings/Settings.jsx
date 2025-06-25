@@ -16,7 +16,7 @@ export default function Settings() {
   const [cookies] = useCookies(["auth_token"]);
   const [loader, setLoader] = useState(false);
   const [info, setInfo] = useState("");
-  const [addInfo, setAddInfo] = useState(false)
+  const [addInfo, setAddInfo] = useState(false);
   const [initialFilters, setInitialFilters] = useState({});
   const [initialAccData, setInitialAccData] = useState({
     email: "",
@@ -63,61 +63,234 @@ export default function Settings() {
     }
   }, [userInfo]);
 
-const updateUserInfo = async () => {
-  setLoader(true);
+  const updateUserInfo = async () => {
+    setLoader(true);
 
-  try {
-    const sendData = {
-      email: userAccountData.email,
-      password: userAccountData.password,
-      phone_number: userAccountData.phone_number,
-      filter: filters,
-    };
+    try {
+      const sendData = {
+        email: userAccountData.email,
+        password: userAccountData.password,
+        phone_number: userAccountData.phone_number,
+        filter: filters,
+      };
 
-    const response = await fetch(
-      "https://tenderstest.dev.regiuslab.by/v1/user/me",
-      {
-        method: "PATCH",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${cookies.auth_token}`,
-        },
-        body: JSON.stringify(sendData),
+      const response = await fetch(
+        "https://tenderstest.dev.regiuslab.by/v1/user/me",
+        {
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.auth_token}`,
+          },
+          body: JSON.stringify(sendData),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.status === 498 || response.status === 403) {
+        return logout();
       }
-    );
 
-    const data = await response.json();
-
-    if (response.status === 498 || response.status === 403) {
-      return logout();
+      if (response.ok) {
+        setInfo("Данные успешно обновлены");
+        setAddInfo(false);
+        refreshUserInfo();
+      } else {
+        setError("Ошибка обновления данных");
+      }
+    } catch (err) {
+      setError("Произошла сетевая ошибка");
+    } finally {
+      setLoader(false);
     }
+  };
 
-    if (response.ok) {
-      setInfo("Данные успешно обновлены");
-      setAddInfo(false);
-      refreshUserInfo();
-    } else {
-      setError("Ошибка обновления данных");
+  const [showEmailPopup, setShowEmailPopup] = useState(false);
+  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  // Update email
+  const updateEmail = async () => {
+    setLoader(true);
+    try {
+      const response = await fetch(
+        "https://tenderstest.dev.regiuslab.by/v1/user/me",
+        {
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.auth_token}`,
+          },
+          body: JSON.stringify({ email: newEmail }),
+        }
+      );
+      if (response.status === 498 || response.status === 403) return logout();
+      const data = await response.json();
+      if (response.ok) {
+        setInfo("Email успешно обновлен");
+        refreshUserInfo();
+        setShowEmailPopup(false);
+      } else {
+        setErrorPop(data.message || "Ошибка обновления email");
+      }
+    } catch {
+      setErrorPop("Произошла сетевая ошибка");
+    } finally {
+      setLoader(false);
     }
-  } catch (err) {
-    setError("Произошла сетевая ошибка"); 
-  } finally {
-    setLoader(false); 
-  }
-};
+  };
 
+  // Update password
+  const updatePassword = async () => {
+    setLoader(true);
+    try {
+      const response = await fetch(
+        "https://tenderstest.dev.regiuslab.by/v1/user/me",
+        {
+          method: "PATCH",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${cookies.auth_token}`,
+          },
+          body: JSON.stringify({ password: newPassword }),
+        }
+      );
+      if (response.status === 498 || response.status === 403) return logout();
+      const data = await response.json();
+      if (response.ok) {
+        setInfo("Пароль успешно обновлен");
+        setShowPasswordPopup(false);
+      } else {
+        setErrorPop(data.message || "Ошибка обновления пароля");
+      }
+    } catch {
+      setErrorPop("Произошла сетевая ошибка");
+    } finally {
+      setLoader(false);
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-[40px]">
+    <div className="flex flex-col gap-[40px] p-[20px]">
       {loader && <Loader isFull={true} />}
 
       {info !== "" && <InfoPopup text={info} setInfo={setInfo} />}
 
       {error !== "" && <ErrorPopup text={errorPop} setError={setErrorPop} />}
+      {showEmailPopup && (
+        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-999999999999 h-screen flex">
+          <div className="bg-[#DDEDD1] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[20px]">
+            <h3 className="text-2xl">Новый email</h3>
+            <InputText
+              placeholder="Введите новый email"
+              value={newEmail}
+              type="text"
+              isRequired={true}
+              onChange={(e) => setNewEmail(e.target.value)}
+            />
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setShowEmailPopup(false)}
+                className="px-4 py-2 rounded-xl bg-[#646d5c]/25 text-[#646d5c] hover:bg-[#646d5c]/40"
+              >
+                Отмена
+              </button>
+              <button
+                onClick={updateEmail}
+                className="px-4 py-2 rounded-xl bg-[#646d5c]/90 text-white hover:bg-[#646d5c]"
+              >
+                Отправить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showPasswordPopup && (
+        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-999999999999 h-screen flex">
+          <div className="bg-[#DDEDD1] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[20px]">
 
+            <h3 className="text-2xl">Новый пароль</h3>
+            <InputText
+              placeholder="Введите новый пароль"
+              value={newPassword}
+              type="password"
+              isRequired={true}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setShowPasswordPopup(false)}
+                className="px-4 py-2 rounded-xl bg-[#646d5c]/25 text-[#646d5c] hover:bg-[#646d5c]/40"
+              >
+                Отмена
+              </button>
+              <button
+                onClick={updatePassword}
+                className="px-4 py-2 rounded-xl bg-[#646d5c]/90 text-white hover:bg-[#646d5c]"
+              >
+                Отправить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {userInfo ? (
         <>
+          <div className="flex flex-col gap-[30px]">
+            <p className="text-3xl font-medium ">Учетные данные</p>
+
+            <div className="flex flex-col gap-[20px]">
+              <div className="flex flex-col ">
+                <p className="text-[16px] opacity-65">Название компании:</p>
+                <p className="text-[22px] leading-6">{userInfo.company_name}</p>
+              </div>
+              <div className="flex flex-col ">
+                <p className="text-[16px] opacity-65">Номер телефона</p>
+                <p className="text-[22px] leading-6">{userInfo.phone_number}</p>
+              </div>
+              <div className="flex flex-col ">
+                <p className="text-[16px] opacity-65">Дата регистрации</p>
+                <p className="text-[22px] leading-6">
+                  {userInfo.registration_date}
+                </p>
+              </div>
+              <div className="flex flex-col ">
+                <p className="text-[16px] opacity-65">Email</p>
+                <p className="text-[22px] leading-6">{userInfo.email}</p>
+              </div>
+
+              <div className="flex gap-[20px]">
+                <button
+                  className={`p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
+    bg-[#646d5c]/90 cursor-pointer hover:bg-[#646d5c] mt-[10px]`}
+                  onClick={() => {
+                    setNewEmail(userInfo.email);
+                    setShowEmailPopup(true);
+                  }}
+                >
+                  Изменить email
+                </button>
+
+                <button
+                  className={`p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
+    bg-[#646d5c]/90 cursor-pointer hover:bg-[#646d5c] mt-[10px]`}
+                  onClick={() => setShowPasswordPopup(true)}
+                >
+                  Изменить пароль
+                </button>
+              </div>
+            </div>
+
+        
+
+        
+          </div>
+
           {filterSum !== "" ? (
             <div className="flex flex-col gap-[30px]">
               <p className="text-3xl font-medium ">Фильтр</p>
@@ -159,106 +332,60 @@ const updateUserInfo = async () => {
               <button
                 className={`p-[10px_25px] w-fit rounded-xl text-white justify-center text-[20px] whitespace-nowrap bg-[#646d5c]/90 cursor-pointer hover:bg-[#646d5c]
    `}
-                onClick={()=> setAddInfo(true)}
+                onClick={() => setAddInfo(true)}
               >
                 Добавить фильтры
               </button>
             </div>
           )}
-          <div className="flex flex-col gap-[30px]">
-            <p className="text-3xl font-medium ">Учетные данные</p>
-            <div className="flex flex-col gap-[20px]">
-              {Object.entries(userAccountData).map(([key, value]) => (
-                <InputText
-                  key={key}
-                  placeholder={
-                    key === "password"
-                      ? "Введите новый пароль"
-                      : key === "phone_number"
-                      ? "Номер телефона"
-                      : "Email"
-                  }
-                  value={value}
-                  type={key !== "password" ? "text" : "password"}
-                  isRequired={false}
-                  onChange={(e) =>
-                    setUserAccountData({
-                      ...userAccountData,
-                      [key]: e.target.value,
-                    })
-                  }
-                />
-              ))}
-            </div>
-
-            <butto
-              className={`p-[10px_25px] w-fit rounded-xl text-white justify-center text-[20px] whitespace-nowrap
-    ${
-      isAccDataChanged
-        ? "bg-[#646d5c]/90 cursor-pointer hover:bg-[#646d5c]"
-        : "opacity-50 pointer-events-none bg-[#646d5c]/40 cursor-default"
-    }`}
-              onClick={updateUserInfo}
-            >
-              Обновить учетные данные
-            </butto>
-          </div>
         </>
       ) : (
         <Loader isFull={true} />
       )}
 
-
-{addInfo && (
-
-     <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-999 h-screen flex ">
-        <div className="bg-[#DDEDD1] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[30px]">
-
-          <p className="text-2xl">
-          Введите информацию фильтров
-        </p>
-              <div className="flex flex-col gap-[10px] w-full">
-
-          {Object.entries(filters).map(([key, value]) => (
-            <div className="flex flex-col w-full gap-[5px]" key={key}>
-              <p className="">{key}</p>
-              <InputText
-                placeholder={""}
-                value={value}
-                type="text"
-                isRequired={false}
-                onChange={(e) =>
-                  setFilters({ ...filters, [key]: e.target.value })
-                }
-              />
+      {addInfo && (
+        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-999 h-screen flex ">
+          <div className="bg-[#DDEDD1] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[30px]">
+            <p className="text-2xl">Введите информацию фильтров</p>
+            <div className="flex flex-col gap-[10px] w-full">
+              {Object.entries(filters).map(([key, value]) => (
+                <div className="flex flex-col w-full gap-[5px]" key={key}>
+                  <p className="">{key}</p>
+                  <InputText
+                    placeholder={""}
+                    value={value}
+                    type="text"
+                    isRequired={false}
+                    onChange={(e) =>
+                      setFilters({ ...filters, [key]: e.target.value })
+                    }
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-          <div className="grid grid-cols-2 gap-[10px] w-full">
-          <button
-            onClick={() => setAddInfo(false)}
-            className="p-[10px_25px] w-full bg-[#646d5c]/25 rounded-xl text-[#646d5c] justify-center text-[20px]   hover:bg-[#646d5c]/40 whitespace-nowrap"
-          >
-            Отмена
-          </button>
-          <button
-             className={`p-[10px_25px]  rounded-xl text-white justify-center text-[20px] whitespace-nowrap
+            <div className="grid grid-cols-2 gap-[10px] w-full">
+              <button
+                onClick={() => setAddInfo(false)}
+                className="p-[10px_25px] w-full bg-[#646d5c]/25 rounded-xl text-[#646d5c] justify-center text-[20px]   hover:bg-[#646d5c]/40 whitespace-nowrap"
+              >
+                Отмена
+              </button>
+              <button
+                className={`p-[10px_25px]  rounded-xl text-white justify-center text-[20px] whitespace-nowrap
     ${
       isFiltersChanged
         ? "bg-[#646d5c]/90 cursor-pointer hover:bg-[#646d5c]"
         : "opacity-50 pointer-events-none bg-[#646d5c]/40 cursor-default"
     }`}
                 onClick={isFiltersChanged ? updateUserInfo : undefined}
-              
-          >
-            Отправить
-          </button>
+              >
+                Отправить
+              </button>
+            </div>
+          </div>
         </div>
-        </div>
-      </div>
-)}
-   
+      )}
     </div>
   );
 }

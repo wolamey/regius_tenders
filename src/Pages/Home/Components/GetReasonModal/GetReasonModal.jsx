@@ -42,7 +42,7 @@ export default function GetReasonModal({ tenderID, setUnsuitableID ,getTenders})
       getTenders()
     }
 
-    console.log(data);
+    // console.log(data);
   };
 
   useEffect(() => {
