@@ -1,6 +1,7 @@
 import React from "react";
 
 export default function LotsFull({ lots, setShowFull }) {
+  console.log(lots.length);
   return (
     <div
       className="fixed inset-0 backdrop-blur-xs bg-[#646D5C]/50 z-[999999999] h-screen flex"
@@ -10,7 +11,7 @@ export default function LotsFull({ lots, setShowFull }) {
         className="bg-white max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col gap-[20px] max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()} // чтобы клик внутри не закрывал
       >
-        <h2 className="text-2xl text-center">Список лотов</h2>
+                <p className="text-2xl text-center">Лоты: {lots.length}</p>
 
         <div className="flex flex-col gap-[10px] max-h-[50vh] overflow-auto">
           {lots.map((lot) => (

@@ -4,13 +4,27 @@ import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import { useCookies } from "react-cookie";
 import useUserInfo from "../../hooks/useUserInfo";
 
-export default function UserInfoLine() {
+export default function UserInfoLine({isSideBarHidden,setIsSideBarHidden,screenWidth}) {
   const { userInfo, error, setError } = useUserInfo();
   if (error) setError(error);
-
+  const [isActive, setIsActive] = useState(false);
   return (
     <div className="bg-[#f6fcf2] p-[20px] w-full flex justify-between items-center shadow-2xl/7 z-999">
-      <div className=""></div>
+      <div className="">
+
+
+        {screenWidth<1024 &&(
+          <button
+      className={`hamburger hamburger--spin ${isActive ? 'is-active' : ''}`}
+      type="button"
+      onClick={() =>{ setIsActive(!isActive);setIsSideBarHidden(!isSideBarHidden) }}
+    >
+      <span className="hamburger-box">
+        <span className="hamburger-inner"></span>
+      </span>
+    </button>
+        )}
+      </div>
       {error !== "" && <ErrorPopup errText={error} setError={setError} />}
       {userInfo ? (
         <div className="flex items-center gap-[10px] ">

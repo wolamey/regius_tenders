@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Sidebar.scss";
 import icon1 from "../../assets/images/sidebarIcon1.svg";
 import { Link, useLocation } from "react-router-dom";
 import useUserInfo from "../../hooks/useUserInfo";
 import Loader from "../Loader/Loader";
-export default function Sidebar({ pageName }) {
+export default function Sidebar({ pageName,isSideBarHidden }) {
   const tabs = [
     {
       image: (
@@ -89,21 +89,23 @@ export default function Sidebar({ pageName }) {
   const location = useLocation();
   const path = location.pathname;
 
+
+
   const { userInfo, error, setError } = useUserInfo();
   if (error) setError(error);
   // console.log(userInfo);
   return (
-    <div className="h-screen bg-[#646D5C] flex flex-col justify-between  p-[20px] min-w-[30vh]">
+    <div className={`${isSideBarHidden? 'max-w-0 overflow-hidden' : 'max-w-[500px]  p-[20px] '} h-screen bg-[#646D5C] flex flex-col justify-between min-w-[30vh] sidebar`}>
       <div className="">
         <p className="text-3xl text-white mb-[40px]">{pageName}</p>
 
-        <div className="flex flex-col gap-[10px] ">
+        <div className="flex flex-col gap-[10px] sidebar_item">
           {tabs.map((item, index) => (
             <Link
               to={item.link}
               className={`${
                 path === item.link ? "active  bg-[#77826E] " : ""
-              }tab_item rounded-lg group flex gap-[12px] items-center p-[10px] peer  `}
+              }tab_item rounded-lg group flex gap-[12px] items-center p-[10px_20px] peer  `}
               key={index}
             >
               {item.image}
@@ -116,7 +118,7 @@ export default function Sidebar({ pageName }) {
       </div>
 
       {userInfo ? (
-        <div className="text-white">
+        <div className="text-white whitespace-nowrap ">
           Осталось дней: {userInfo.remaining_days}
         </div>
       ) : (

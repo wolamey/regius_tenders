@@ -27,13 +27,27 @@ export default function Home() {
   const [platformStatustes, setPlatformStatuses] = useState(null);
   const [tendersLoader, setTendersLoader] = useState(false);
 
-  
 
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [isFiltersHidden, setIsFiltersHidden] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    console.log(screenWidth)
+setIsFiltersHidden(screenWidth < 1024? true :false)
+console.log(isFiltersHidden)
+    window.addEventListener("resize", handleResize);
+
+    handleResize();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const logout = useLogout();
 
-
-const getTenders = async () => {
+  const getTenders = async () => {
     setTendersLoader(true);
     const params = new URLSearchParams({});
 
@@ -43,7 +57,7 @@ const getTenders = async () => {
     if (filters.platform !== "") {
       params.set("platform_status", filters.platform);
     }
-   
+
     try {
       const response = await fetch(
         `https://tenderstest.dev.regiuslab.by/v1/user/tenders?${params}`,
@@ -74,14 +88,13 @@ const getTenders = async () => {
     } finally {
       setTimeout(() => {
         setTendersLoader(false);
-      }, 300); 
+      }, 300);
     }
   };
 
   useEffect(() => {
     getTenders();
   }, [filters]);
-
 
   const copyToClipboard = async (text) => {
     try {
@@ -242,12 +255,6 @@ const getTenders = async () => {
     });
   };
 
-
-
-
-
-
-  
   return (
     <div className="flex flex-col ">
       {infoPopupText !== "" && (
@@ -261,8 +268,8 @@ const getTenders = async () => {
         />
       )}
       {error !== "" && <ErrorPopup errText={error} setError={setError} />}
-
-         <div className="flex flex-col  gap-[20px] pr-[20px]  pl-[20px]  pb-[20px] sticky top-0 z-9999 bg-[#DBEBCF] ">
+<div className=" sticky top-0 z-9999 bg-[#DBEBCF]">
+      <div className={`overflow-hidden flex flex-col    gap-[20px] pr-[20px]  pl-[20px]   ${isFiltersHidden? 'max-h-[0px] ' : 'max-h-[900px] pb-[20px] '} `}>
         <div className="grid grid-cols-[1fr_1fr]  gap-[20px]">
           <div className="flex flex-col gap-[5px]">
             <p>Пользовательский статус</p>
@@ -338,11 +345,69 @@ const getTenders = async () => {
             filters.platform === "" && filters.status === ""
               ? "opacity-50 pointer-events-none"
               : ""
-          } p-[10px_20px] underline border-2 border-[#B05959] rounded-xl bg-[#ffacac]/20 hover:bg-[#ffacac]/50`}
+          }  p-[10px_20px] underline border-2 border-[#B05959] rounded-xl bg-[#ffacac]/20 hover:bg-[#ffacac]/50`}
         >
           Очистить все фильтры
         </button>
+
+    
       </div>
+    <div className="showFilters rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap w-[-webkit-fill-available] text-center bg-white flex gap-[5px] justify-center items-center hidden m-[0_20px_20px_20px]"
+    onClick={()=> setIsFiltersHidden(!isFiltersHidden)}
+    >
+          Фильтры
+
+          {isFiltersHidden ? (
+ <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="12"
+            viewBox="0 0 14 12"
+            fill="none"
+          >
+            <g clip-path="url(#clip0_90_8)">
+              <path
+                d="M11.582 6.26953L6.99906 10.5L2.41609 6.26953"
+                stroke="black"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M7 10.5L7 1.5"
+                stroke="black"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_90_8">
+                <rect
+                  width="12"
+                  height="13"
+                  fill="white"
+                  transform="matrix(0 1 -1 0 13.5 0)"
+                />
+              </clipPath>
+            </defs>
+          </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="12" viewBox="0 0 14 12" fill="none">
+  <g clip-path="url(#clip0_90_8)">
+    <path d="M11.582 5.73047L6.99906 1.50004L2.41609 5.73047" stroke="black" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7 1.50005L7 10.5" stroke="black" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <defs>
+    <clipPath id="clip0_90_8">
+      <rect width="12" height="13" fill="white" transform="matrix(0 -1 -1 0 13.5 12)"/>
+    </clipPath>
+  </defs>
+</svg>
+          )}
+         
+        </div>
+        </div>
 
 
       <div className="flex flex-col gap-[30px] p-[20px]">
@@ -372,7 +437,13 @@ const getTenders = async () => {
                       : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
                   } border-2 rounded-2xl w-fit p-[0_15px] `}
                 >
-                  {item.status}
+                  {item.status === "open"
+                    ? "Подача документов"
+                    : item.status === "work"
+                    ? "Работа комиссии"
+                    : item.status === "completed"
+                    ? "Завершен"
+                    : "Отменен"}
                 </div>
                 <div
                   className={`${
@@ -385,12 +456,18 @@ const getTenders = async () => {
                       : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
                   } border-2 rounded-2xl w-fit p-[0_15px] `}
                 >
-                  {item.user_status}
+                  {item.user_status === "not_reviewed"
+                    ? "Не рассмотрен"
+                    : item.user_status === "suitable"
+                    ? "Подходящий"
+                    : item.user_status === "Подходящий"
+                    ? "Не подходящий"
+                    : "Взят в работу"}
                 </div>
               </div>
               <div className="flex flex-col ">
                 <p className="text-3xl font-medium ">{item.name}</p>
-                <div className="flex justify-between w-full items-center flex-wrap gap-[20px]">
+                <div className="flex justify-between w-full items-center flex-wrap gap-[10px_20px]">
                   <Link
                     to={item.link}
                     className="flex gap-[5px] text-[#646D5C] "
@@ -408,7 +485,7 @@ const getTenders = async () => {
                     </p>
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-xs text-black/60">Сумма:</p>
+                    <p className="text-m text-black/60">Сумма:</p>
                     <p className=" text-xl font-extrabold">
                       {getFinalAmount(item.lots)} {item.lots[0].currency}
                     </p>
@@ -424,24 +501,26 @@ const getTenders = async () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-[2fr_3fr] gap-[30px] items-end">
-                <div className="grid grid-cols-[auto_3fr] gap-[10px_25px] items-center">
-                  <p className="text-xs text-black/60">Платформа:</p>
+              <div className=" grid grid-cols-[2fr_3fr] gap-[30px] items-end tender-main">
+                <div className="grid grid-cols-[auto_3fr] gap-[10px_25px] items-center tender-left">
+                  <p className="text-m text-black/60"> Заказчик:</p>
+                  <p className="">{item.customer_name}</p>
+                  <p className="text-m text-black/60">Платформа:</p>
                   <p className="">{item.platform.name}</p>
-                  <p className="text-xs text-black/60">Даты подачи:</p>
+                  <p className="text-m text-black/60">Даты подачи:</p>
                   <p className="">
                     {formatDateOnly(item.start_date)} -{" "}
                     {formatDateOnly(item.end_date)}
                   </p>
 
-                  <div className=" col-span-full grid grid-cols-[1fr_1fr] pt-[15px] gap-[15px]">
+                  <div className="col-span-full flex flex-wrap gap-[15px] pt-[15px] btn-wrapper ">
                     <button
                       onClick={() => markAsSuitable(item.id)}
                       className={`${
                         item.user_status === "suitable"
-                          ? "bg-[#646d5c]/75  text-[#F6FCF2] active pointer-events-none"
-                          : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40  text-[#646d5c]"
-                      } button-suitable p-[10px_25px] flex items-center gap-[5px]  rounded-xl justify-center text-[20px]    whitespace-nowrap `}
+                          ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                          : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
+                      } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full  sm:w-[calc(50%-7.5px)] min-w-[200px] `}
                     >
                       <LikeIcon className="item-button-svg" />
                       Подходящий
@@ -451,26 +530,27 @@ const getTenders = async () => {
                       onClick={() => setUnsuitableID(item.id)}
                       className={`${
                         item.user_status === "unsuitable"
-                          ? "bg-[#646d5c]/75  text-[#F6FCF2] active pointer-events-none"
-                          : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40  text-[#646d5c]"
-                      } button-suitable  p-[10px_25px] flex items-center gap-[5px]  rounded-xl justify-center text-[20px]    whitespace-nowrap`}
+                          ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                          : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
+                      } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full sm:w-[calc(50%-7.5px)] min-w-[200px]`}
                     >
                       <Dislike className="item-button-svg" />
                       Не подходящий
                     </button>
+
                     <button
                       onClick={() => MarkAsTakenIntoWork(item.id)}
                       className={`${
                         item.user_status === "taken_into_work"
-                          ? "bg-[#646d5c]/75  text-[#F6FCF2]  active pointer-events-none"
-                          : " bg-[#646d5c]/10 hover:bg-[#646d5c]/20  text-[#646d5c] border-[#646d5c]"
-                      }  button-suitable p-[10px_25px] flex items-center gap-[5px]  rounded-xl justify-center text-[20px]    whitespace-nowrap col-span-full  border-2    `}
+                          ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                          : "bg-[#646d5c]/10 hover:bg-[#646d5c]/20 text-[#646d5c] border-[#646d5c]"
+                      } button-suitable col-span-full flex w-full items-center justify-center gap-[5px] rounded-xl border-2 p-[10px_25px] text-[20px] whitespace-nowrap`}
                     >
                       <WorkImg className="item-button-svg" />В работу
                     </button>
                   </div>
                 </div>
-  <LotsWrap lots={item.lots} index={index} />
+                <LotsWrap lots={item.lots} index={index} />
                 {/* <div className="lots-wrap bg-white p-[20px] rounded-2xl  overflow-hidden relative">
                   <div className="absolute bottom-0 bg-fade-white h-[70px] w-full"></div>
                   <p className="text-2xl mb-[20px]">Лоты: {item.lots.length}</p>
