@@ -95,7 +95,8 @@ export default function Sidebar({ pageName,isSideBarHidden }) {
   if (error) setError(error);
   // console.log(userInfo);
   return (
-    <div className={`${isSideBarHidden? 'max-w-0 overflow-hidden' : 'max-w-[500px]  p-[20px] '} h-screen bg-[#646D5C] flex flex-col justify-between min-w-[30vh] sidebar`}>
+    <div className={`${isSideBarHidden? 'w-0 min-w-0 ' : 'w-[250px] min-w-[250px]  p-[20px] '} h-screen bg-[#646D5C] flex flex-col justify-between sidebar transition-all duration-500 ease-in-out overflow-hidden`}>
+      
       <div className="">
         <p className="text-3xl text-white mb-[40px]">{pageName}</p>
 
@@ -109,7 +110,7 @@ export default function Sidebar({ pageName,isSideBarHidden }) {
               key={index}
             >
               {item.image}
-              <p className="text-white text-[18px] group-hover:text-[#DDEDD1]">
+              <p className="text-white whitespace-nowrap text-[18px] group-hover:text-[#DDEDD1]">
                 {item.name}
               </p>
             </Link>

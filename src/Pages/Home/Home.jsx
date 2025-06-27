@@ -270,7 +270,7 @@ console.log(isFiltersHidden)
       {error !== "" && <ErrorPopup errText={error} setError={setError} />}
 <div className=" sticky top-0 z-9999 bg-[#DBEBCF]">
       <div className={`overflow-hidden flex flex-col    gap-[20px] pr-[20px]  pl-[20px]   ${isFiltersHidden? 'max-h-[0px] ' : 'max-h-[900px] pb-[20px] '} `}>
-        <div className="grid grid-cols-[1fr_1fr]  gap-[20px]">
+        <div className="grid grid-cols-[1fr_1fr]  gap-[20px] filters">
           <div className="flex flex-col gap-[5px]">
             <p>Пользовательский статус</p>
 
@@ -292,7 +292,7 @@ console.log(isFiltersHidden)
                       filters.status === key
                         ? "bg-white"
                         : "bg-white/30 hover:bg-white/60"
-                    } border-2 border-[#646D5C] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap `}
+                    } border-2 border-[#646D5C] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item`}
                     key={key}
                     value={key}
                   >
@@ -325,7 +325,7 @@ console.log(isFiltersHidden)
                       filters.platform === key
                         ? "bg-white"
                         : "bg-white/30 hover:bg-white/60"
-                    } border-2 border-[#646D5C] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap `}
+                    } border-2 border-[#646D5C] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item `}
                     key={key}
                     value={key}
                   >
@@ -422,7 +422,7 @@ console.log(isFiltersHidden)
         ) : tenders.length !== 0 ? (
           tenders.map((item, index) => (
             <div
-              className="bg-[#F6FCF2] p-[30px] rounded-lg relative flex flex-col gap-[30px]"
+              className="bg-[#F6FCF2] p-[30px] rounded-lg relative flex flex-col gap-[30px] card"
               key={index}
             >
               <div className=" absolute  top-[-10px] right-[-10px] flex gap-[10px] ">
@@ -435,7 +435,7 @@ console.log(isFiltersHidden)
                       : item.status === "completed"
                       ? "bg-[#E4FFD7] text-[#3D6821] border-[#5FB059]"
                       : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
-                  } border-2 rounded-2xl w-fit p-[0_15px] `}
+                  } border-2 rounded-2xl w-fit p-[0_15px] tag `}
                 >
                   {item.status === "open"
                     ? "Подача документов"
@@ -454,7 +454,7 @@ console.log(isFiltersHidden)
                       : item.user_status === "suitable"
                       ? "bg-[#E4FFD7] text-[#3D6821] border-[#5FB059]"
                       : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
-                  } border-2 rounded-2xl w-fit p-[0_15px] `}
+                  } border-2 rounded-2xl w-fit p-[0_15px]  tag`}
                 >
                   {item.user_status === "not_reviewed"
                     ? "Не рассмотрен"
@@ -467,7 +467,7 @@ console.log(isFiltersHidden)
               </div>
               <div className="flex flex-col ">
                 <p className="text-3xl font-medium ">{item.name}</p>
-                <div className="flex justify-between w-full items-center flex-wrap gap-[10px_20px]">
+                <div className="flex justify-between w-full items-center flex-wrap gap-[10px_20px] card-basic">
                   <Link
                     to={item.link}
                     className="flex gap-[5px] text-[#646D5C] "
@@ -504,11 +504,11 @@ console.log(isFiltersHidden)
               <div className=" grid grid-cols-[2fr_3fr] gap-[30px] items-end tender-main">
                 <div className="grid grid-cols-[auto_3fr] gap-[10px_25px] items-center tender-left">
                   <p className="text-m text-black/60"> Заказчик:</p>
-                  <p className="">{item.customer_name}</p>
+                  <p className="card_info-item">{item.customer_name}</p>
                   <p className="text-m text-black/60">Платформа:</p>
-                  <p className="">{item.platform.name}</p>
+                  <p className="card_info-item">{item.platform.name}</p>
                   <p className="text-m text-black/60">Даты подачи:</p>
-                  <p className="">
+                  <p className="card_info-item">
                     {formatDateOnly(item.start_date)} -{" "}
                     {formatDateOnly(item.end_date)}
                   </p>

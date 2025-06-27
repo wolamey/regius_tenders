@@ -247,24 +247,24 @@ export default function Settings() {
             <div className="flex flex-col gap-[20px]">
               <div className="flex flex-col ">
                 <p className="text-[16px] opacity-65">Название компании:</p>
-                <p className="text-[22px] leading-6">{userInfo.company_name}</p>
+                <p className="text-[22px] leading-6 settings_item_info">{userInfo.company_name}</p>
               </div>
               <div className="flex flex-col ">
                 <p className="text-[16px] opacity-65">Номер телефона</p>
-                <p className="text-[22px] leading-6">{userInfo.phone_number}</p>
+                <p className="text-[22px] leading-6 settings_item_info">{userInfo.phone_number}</p>
               </div>
               <div className="flex flex-col ">
                 <p className="text-[16px] opacity-65">Дата регистрации</p>
-                <p className="text-[22px] leading-6">
+                <p className="text-[22px] leading-6 settings_item_info">
                   {userInfo.registration_date}
                 </p>
               </div>
               <div className="flex flex-col ">
                 <p className="text-[16px] opacity-65">Email</p>
-                <p className="text-[22px] leading-6">{userInfo.email}</p>
+                <p className="text-[22px] leading-6 settings_item_info">{userInfo.email}</p>
               </div>
 
-              <div className="flex gap-[20px]">
+              <div className="flex gap-[0px_20px] flex-wrap">
                 <button
                   className={`p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
     bg-[#646d5c]/90 cursor-pointer hover:bg-[#646d5c] mt-[10px]`}

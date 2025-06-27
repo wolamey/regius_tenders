@@ -86,7 +86,6 @@ align-items: stretch;
 
 }
 .sidebar{
-  min-width: auto;
 }
 .sidebar p{
   white-space: nowrap;
@@ -102,4 +101,67 @@ flex-wrap: wrap;
   display: flex;
 }
 
+}
+
+@media (max-width: 550px) {
+.text-3xl{
+  font-size: 26px;
+}
+.tag{
+  font-size: 12px;
+}
+.filter_item{
+  padding: 3px 10px;
+  font-size: 14px;
+}
+.card{
+  padding: 15px;
+}
+.card-basic{
+ align-items: start;
+    margin: 20px 0 0 0;
+    display: grid
+;
+}
+   .tender-left{
+    gap: 0;
+  grid-template-columns: auto;
+   }
+   .card_info-item{
+    margin: 0 0 10px 0;
+   }
+   .btn-wrapper{
+    gap: 10px;
+   }
+   .btn-wrapper button{
+    font-size: 16px;
+    padding: 5px 10px;
+   }
+   .btn-wrapper button svg{
+width: 20px;
+max-width: 20px;
+min-width: 0;
+   }
+
+   .text-2xl {
+    font-size: 20px;
+   }
+   .lots-wrap{
+    padding: 10px;
+   }
+   .settings_item_info{
+    font-size: 18px;
+   }
+   .filters{
+    display: flex;
+    flex-wrap: wrap;
+   }
+
+   .text-6xl{
+    font-size: 28px;
+   }
+   .big-button{
+    padding: 10px;
+    width: 100%;
+   }
 }

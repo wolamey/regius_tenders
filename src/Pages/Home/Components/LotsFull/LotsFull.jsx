@@ -21,7 +21,7 @@ export default function LotsFull({ lots, setShowFull }) {
             >
               <span>{lot.id}</span>
               <span>{lot.name}</span>
-              <span className="text-gray-700 font-medium ">
+              <span className="text-gray-700 font-medium  whitespace-nowrap">
                 {lot.price} {lot.currency}
               </span>
             </div>
