@@ -13,7 +13,10 @@ import InfoPopup from "../../Components/InfoPopup/InfoPopup";
 import GetReasonModal from "./Components/GetReasonModal/GetReasonModal";
 import { Link } from "react-router-dom";
 import LotsWrap from "./Components/LotsWrap/LotsWrap";
-export default function Home() {
+import { Store } from "react-notifications-component";
+import { notify } from "../../utils/notify";
+import { tryProtectedRequest } from "../../utils/tryProtectedRequest";
+export default function Home({ refreshToken }) {
   const [error, setError] = useState("");
   const [cookies] = useCookies(["auth_token"]);
   const [tenders, setTenders] = useState([]);
@@ -27,15 +30,14 @@ export default function Home() {
   const [platformStatustes, setPlatformStatuses] = useState(null);
   const [tendersLoader, setTendersLoader] = useState(false);
 
-
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  const [isFiltersHidden, setIsFiltersHidden] = useState(false)
+  const [isFiltersHidden, setIsFiltersHidden] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
-    console.log(screenWidth)
-setIsFiltersHidden(screenWidth < 1024? true :false)
-console.log(isFiltersHidden)
+    // console.log(screenWidth);
+    setIsFiltersHidden(screenWidth < 1024 ? true : false);
+    // console.log(isFiltersHidden);
     window.addEventListener("resize", handleResize);
 
     handleResize();
@@ -50,41 +52,35 @@ console.log(isFiltersHidden)
   const getTenders = async () => {
     setTendersLoader(true);
     const params = new URLSearchParams({});
-
-    if (filters.status !== "") {
-      params.set("user_status", filters.status);
-    }
-    if (filters.platform !== "") {
+    if (filters.status !== "") params.set("user_status", filters.status);
+    if (filters.platform !== "")
       params.set("platform_status", filters.platform);
-    }
 
     try {
-      const response = await fetch(
-        `https://tenderstest.dev.regiuslab.by/v1/user/tenders?${params}`,
-        {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${cookies.auth_token}`,
-          },
-        }
-      );
-      const data = await response.json();
+      const { data, response } = await tryProtectedRequest({
+        url: `https://tendersiteapi.dev.regiuslab.by/v1/user/tenders?${params}`,
+        method: "GET",
+        token: cookies.auth_token,
+        refreshToken,
+        logout,
+      });
 
-      console.log(data);
-      if (response.status === 403) {
-        return logout();
-      }
       if (!response.ok) {
-        setError(data.detail);
+        notify({
+          title: "Ошибка",
+          message: data.detail,
+          type: "danger",
+        });
         return;
       }
-      if (response.ok && data.length === 0) {
-        setTenders(0);
-        return;
-      }
-      setTenders(data);
+console.log(data)
+      setTenders(data.tenders || 0);
     } catch (err) {
-      setError(err);
+      notify({
+        title: "Ошибка",
+        message: err,
+        type: "danger",
+      });
     } finally {
       setTimeout(() => {
         setTendersLoader(false);
@@ -100,6 +96,13 @@ console.log(isFiltersHidden)
     try {
       await navigator.clipboard.writeText(text);
       // console.log("скопировано");
+
+      notify({
+        title: "Скопировано",
+        message: `ID "${text}" скопировано`,
+        type: "success",
+        duration: 2000,
+      });
     } catch (err) {
       console.error(err);
     }
@@ -133,70 +136,62 @@ console.log(isFiltersHidden)
     return dateString.split("T")[0];
   };
 
-  const markAsSuitable = async (tenderID) => {
-    const response = await fetch(
-      `https://tenderstest.dev.regiuslab.by/v1/user/tenders/${tenderID}/mark/suitable`,
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${cookies.auth_token}`,
-        },
-      }
-    );
+  const markAsSuitable = async (id) => {
+    const { data, response } = await tryProtectedRequest({
+      url: `https://tendersiteapi.dev.regiuslab.by/v1/user/tenders/${id}/mark/suitable`,
+      method: "POST",
+      token: cookies.auth_token,
+      refreshToken,
+      logout,
+    });
 
-    const data = await response.json();
-    if (response.status === 403) {
-      logout();
-    }
     if (!response.ok) {
-      setError(data.detail);
+      notify({ title: "Ошибка", message: data.detail, type: "danger" });
       return;
     }
-    if (response.ok) {
-      setInfoPopupText(data.message);
-      getTenders();
-    }
-    // console.log(data);
+
+    notify({ title: "Успешно", message: data.message, type: "success" });
+    getTenders();
   };
 
-  const MarkAsTakenIntoWork = async (tenderID) => {
-    try {
-      const response = await fetch(
-        `https://tenderstest.dev.regiuslab.by/v1/user/tenders/${tenderID}/mark/taken_into_work`,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${cookies.auth_token}`,
-          },
-        }
-      );
+const MarkAsTakenIntoWork = async (tenderID) => {
+  try {
+    const { data, response } = await tryProtectedRequest({
+      url: `https://tendersiteapi.dev.regiuslab.by/v1/user/tenders/${tenderID}/mark/taken_into_work`,
+      method: "POST",
+      token: cookies.auth_token,
+      refreshToken,
+      logout,
+    });
 
-      const data = await response.json();
-      // console.log(data);
-
-      if (response.status === 403) {
-        logout();
-      }
-      if (!response.ok) {
-        setError(data.detail);
-
-        return;
-      }
-      if (response.ok) {
-        setInfoPopupText(data.message);
-        getTenders();
-      }
-    } catch (err) {
-      setError(err);
+    if (!response.ok) {
+      notify({
+        title: "Ошибка",
+        message: data.detail,
+        type: "danger",
+      });
+      return;
     }
-  };
 
+    notify({
+      title: "Успешно",
+      message: data.message,
+      type: "success",
+    });
+
+    getTenders();
+  } catch (err) {
+    notify({
+      title: "Ошибка",
+      message: err,
+      type: "danger",
+    });
+  }
+};
   const getUserStatuses = async () => {
     try {
       const response = await fetch(
-        "https://tenderstest.dev.regiuslab.by/v1/util/status/user",
+        "https://tendersiteapi.dev.regiuslab.by/v1/util/status/user",
         {
           method: "GET",
           headers: {
@@ -205,14 +200,19 @@ console.log(isFiltersHidden)
         }
       );
       const data = await response.json();
-      if (response.status === 403) {
+      if (response.status === 404) {
         logout();
       }
       if (response.ok) {
         setUserStatuses(data);
       }
     } catch (err) {
-      setError(err);
+      // setError(err);
+      notify({
+        title: "Ошибка",
+        message: err,
+        type: "danger",
+      });
     }
   };
 
@@ -223,7 +223,7 @@ console.log(isFiltersHidden)
   const getPlatformStatuses = async () => {
     try {
       const response = await fetch(
-        "https://tenderstest.dev.regiuslab.by/v1/util/status/platform",
+        "https://tendersiteapi.dev.regiuslab.by/v1/util/status/platform",
         {
           method: "GET",
           headers: {
@@ -232,15 +232,21 @@ console.log(isFiltersHidden)
         }
       );
       const data = await response.json();
-      console.log(data);
-      if (response.status === 403) {
+      // console.log(data);
+      if (response.status === 404) {
         logout();
       }
       if (response.ok) {
         setPlatformStatuses(data);
       }
     } catch (err) {
-      setError(err);
+      // setError(err);
+
+      notify({
+        title: "Ошибка",
+        message: err,
+        type: "danger",
+      });
     }
   };
 
@@ -265,157 +271,180 @@ console.log(isFiltersHidden)
           tenderID={unsuitableID}
           setUnsuitableID={setUnsuitableID}
           getTenders={getTenders}
+          refreshToken={refreshToken}
         />
       )}
-      {error !== "" && <ErrorPopup errText={error} setError={setError} />}
-<div className=" sticky top-0 z-9999 bg-[#DBEBCF]">
-      <div className={`overflow-hidden flex flex-col    gap-[20px] pr-[20px]  pl-[20px]   ${isFiltersHidden? 'max-h-[0px] ' : 'max-h-[900px] pb-[20px] '} `}>
-        <div className="grid grid-cols-[1fr_1fr]  gap-[20px] filters">
-          <div className="flex flex-col gap-[5px]">
-            <p>Пользовательский статус</p>
-
-            <ul className="flex gap-[10px] flex-wrap">
-              {userStatustes ? (
-                Object.entries(userStatustes).map(([key, value]) => (
-                  <li
-                    onClick={() => {
-                      setFilters((prev) => {
-                        const updated = {
-                          ...prev,
-                          status: filters.status === key ? "" : key,
-                        };
-                        console.log(updated);
-                        return updated;
-                      });
-                    }}
-                    className={`${
-                      filters.status === key
-                        ? "bg-white"
-                        : "bg-white/30 hover:bg-white/60"
-                    } border-2 border-[#646D5C] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item`}
-                    key={key}
-                    value={key}
-                  >
-                    {value}
-                  </li>
-                ))
-              ) : (
-                <Loader isFull={false} />
-              )}
-            </ul>
-          </div>
-          <div className="flex flex-col gap-[5px] ">
-            <p>Статус платформы</p>
-
-            <ul className="flex gap-[10px] flex-wrap">
-              {platformStatustes ? (
-                Object.entries(platformStatustes).map(([key, value]) => (
-                  <li
-                    onClick={() => {
-                      setFilters((prev) => {
-                        const updated = {
-                          ...prev,
-                          platform: key === filters.platform ? "" : key,
-                        };
-                        console.log(updated);
-                        return updated;
-                      });
-                    }}
-                    className={`${
-                      filters.platform === key
-                        ? "bg-white"
-                        : "bg-white/30 hover:bg-white/60"
-                    } border-2 border-[#646D5C] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item `}
-                    key={key}
-                    value={key}
-                  >
-                    {value}
-                  </li>
-                ))
-              ) : (
-                <Loader isFull={false} />
-              )}
-            </ul>
-          </div>
-        </div>
-
-        <button
-          onClick={earaseFilters}
-          className={`${
-            filters.platform === "" && filters.status === ""
-              ? "opacity-50 pointer-events-none"
-              : ""
-          }  p-[10px_20px] underline border-2 border-[#B05959] rounded-xl bg-[#ffacac]/20 hover:bg-[#ffacac]/50`}
+      <div className=" sticky top-0 z-9 bg-[#DBEBCF]">
+        <div
+          className={`overflow-hidden flex flex-col    gap-[20px] pr-[20px]  pl-[20px]   ${
+            isFiltersHidden ? "max-h-[0px] " : "max-h-[900px] pb-[20px] "
+          } `}
         >
-          Очистить все фильтры
-        </button>
+          <div className="grid grid-cols-[1fr_1fr]  gap-[20px] filters">
+            <div className="flex flex-col gap-[5px]">
+              <p>Пользовательский статус</p>
 
-    
-      </div>
-    <div className="showFilters rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap w-[-webkit-fill-available] text-center bg-white flex gap-[5px] justify-center items-center hidden m-[0_20px_20px_20px]"
-    onClick={()=> setIsFiltersHidden(!isFiltersHidden)}
-    >
-          Фильтры
+              <ul className="flex gap-[10px] flex-wrap">
+                {userStatustes ? (
+                  Object.entries(userStatustes).map(([key, value]) => (
+                    <li
+                      onClick={() => {
+                        setFilters((prev) => {
+                          const updated = {
+                            ...prev,
+                            status: filters.status === key ? "" : key,
+                          };
+                          // console.log(updated);
+                          return updated;
+                        });
+                      }}
+                      className={`${
+                        filters.status === key
+                          ? "bg-white"
+                          : "bg-white/30 hover:bg-white/60"
+                      } border-2 border-[#646D5C] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item`}
+                      key={key}
+                      value={key}
+                    >
+                      {value}
+                    </li>
+                  ))
+                ) : (
+                  <Loader isFull={false} />
+                )}
+              </ul>
+            </div>
+            <div className="flex flex-col gap-[5px] ">
+              <p>Статус платформы</p>
 
-          {isFiltersHidden ? (
- <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="12"
-            viewBox="0 0 14 12"
-            fill="none"
+              <ul className="flex gap-[10px] flex-wrap">
+                {platformStatustes ? (
+                  Object.entries(platformStatustes).map(([key, value]) => (
+                    <li
+                      onClick={() => {
+                        setFilters((prev) => {
+                          const updated = {
+                            ...prev,
+                            platform: key === filters.platform ? "" : key,
+                          };
+                          // console.log(updated);
+                          return updated;
+                        });
+                      }}
+                      className={`${
+                        filters.platform === key
+                          ? "bg-white"
+                          : "bg-white/30 hover:bg-white/60"
+                      } border-2 border-[#646D5C] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item `}
+                      key={key}
+                      value={key}
+                    >
+                      {value}
+                    </li>
+                  ))
+                ) : (
+                  <Loader isFull={false} />
+                )}
+              </ul>
+            </div>
+          </div>
+
+          <button
+            onClick={earaseFilters}
+            className={`${
+              filters.platform === "" && filters.status === ""
+                ? "opacity-50 pointer-events-none"
+                : ""
+            }  p-[10px_20px] underline border-2 border-[#B05959] rounded-xl bg-[#ffacac]/20 hover:bg-[#ffacac]/50`}
           >
-            <g clip-path="url(#clip0_90_8)">
-              <path
-                d="M11.582 6.26953L6.99906 10.5L2.41609 6.26953"
-                stroke="black"
-                stroke-width="1.4"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M7 10.5L7 1.5"
-                stroke="black"
-                stroke-width="1.4"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </g>
-            <defs>
-              <clipPath id="clip0_90_8">
-                <rect
-                  width="12"
-                  height="13"
-                  fill="white"
-                  transform="matrix(0 1 -1 0 13.5 0)"
+            Очистить все фильтры
+          </button>
+        </div>
+        <div
+          className="showFilters rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap w-[-webkit-fill-available] text-center bg-white flex gap-[5px] justify-center items-center hidden m-[0_20px_20px_20px]"
+          onClick={() => setIsFiltersHidden(!isFiltersHidden)}
+        >
+          Фильтры
+          {isFiltersHidden ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="12"
+              viewBox="0 0 14 12"
+              fill="none"
+            >
+              <g clip-path="url(#clip0_90_8)">
+                <path
+                  d="M11.582 6.26953L6.99906 10.5L2.41609 6.26953"
+                  stroke="black"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 />
-              </clipPath>
-            </defs>
-          </svg>
+                <path
+                  d="M7 10.5L7 1.5"
+                  stroke="black"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_90_8">
+                  <rect
+                    width="12"
+                    height="13"
+                    fill="white"
+                    transform="matrix(0 1 -1 0 13.5 0)"
+                  />
+                </clipPath>
+              </defs>
+            </svg>
           ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="12" viewBox="0 0 14 12" fill="none">
-  <g clip-path="url(#clip0_90_8)">
-    <path d="M11.582 5.73047L6.99906 1.50004L2.41609 5.73047" stroke="black" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M7 1.50005L7 10.5" stroke="black" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
-  <defs>
-    <clipPath id="clip0_90_8">
-      <rect width="12" height="13" fill="white" transform="matrix(0 -1 -1 0 13.5 12)"/>
-    </clipPath>
-  </defs>
-</svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="12"
+              viewBox="0 0 14 12"
+              fill="none"
+            >
+              <g clip-path="url(#clip0_90_8)">
+                <path
+                  d="M11.582 5.73047L6.99906 1.50004L2.41609 5.73047"
+                  stroke="black"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M7 1.50005L7 10.5"
+                  stroke="black"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_90_8">
+                  <rect
+                    width="12"
+                    height="13"
+                    fill="white"
+                    transform="matrix(0 -1 -1 0 13.5 12)"
+                  />
+                </clipPath>
+              </defs>
+            </svg>
           )}
-         
         </div>
-        </div>
-
+      </div>
 
       <div className="flex flex-col gap-[30px] p-[20px]">
         {tendersLoader ? (
           <div className="m-auto">
             <Loader isFull={false} color="#646D5C" />
           </div>
-        ) : tenders === 0 ? (
+        ) : tenders.length === 0 ? (
           <p className="text-[24px] text-center">
             К сожалению, по данным фильтрам тендера не найдены :(
           </p>
@@ -466,7 +495,7 @@ console.log(isFiltersHidden)
                 </div>
               </div>
               <div className="flex flex-col ">
-                <p className="text-3xl font-medium ">{item.name}</p>
+                <p className="text-3xl font-medium  mb-[30px]">{item.name}</p>
                 <div className="flex justify-between w-full items-center flex-wrap gap-[10px_20px] card-basic">
                   <Link
                     to={item.link}
@@ -515,7 +544,7 @@ console.log(isFiltersHidden)
 
                   <div className="col-span-full flex flex-wrap gap-[15px] pt-[15px] btn-wrapper ">
                     <button
-                      onClick={() => markAsSuitable(item.id)}
+                      onClick={() => markAsSuitable(item.user_tender_id)}
                       className={`${
                         item.user_status === "suitable"
                           ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
@@ -527,7 +556,7 @@ console.log(isFiltersHidden)
                     </button>
 
                     <button
-                      onClick={() => setUnsuitableID(item.id)}
+                      onClick={() => setUnsuitableID(item.user_tender_id)}
                       className={`${
                         item.user_status === "unsuitable"
                           ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
@@ -539,7 +568,7 @@ console.log(isFiltersHidden)
                     </button>
 
                     <button
-                      onClick={() => MarkAsTakenIntoWork(item.id)}
+                      onClick={() => MarkAsTakenIntoWork(item.user_tender_id)}
                       className={`${
                         item.user_status === "taken_into_work"
                           ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"

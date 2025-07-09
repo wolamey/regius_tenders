@@ -1,46 +1,49 @@
 import { useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { useLogout } from "./useLogout";
-import { useNavigate } from "react-router-dom";
+import { notify } from "../utils/notify";
+import { tryProtectedRequest } from "../utils/tryProtectedRequest";
 
-export default function useUserInfo() {
+export default function useUserInfo(refreshToken) {
   const [cookies] = useCookies(["auth_token"]);
   const [userInfo, setUserInfo] = useState(null);
   const [error, setError] = useState("");
-  const [version, setVersion] = useState(0)
+  const [version, setVersion] = useState(0);
 
-  const refreshUserInfo = ()=> setVersion((v)=> v+1)
-const logout = useLogout()
-const navigate = useNavigate()
+  const refreshUserInfo = () => setVersion((v) => v + 1);
+  const logout = useLogout();
+
   useEffect(() => {
     const getUserInfo = async () => {
       try {
-        const response = await fetch("https://tenderstest.dev.regiuslab.by/v1/user/me", {
-          headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${cookies.auth_token}`,
-          },
+        const { data, response } = await tryProtectedRequest({
+          url: "https://tendersiteapi.dev.regiuslab.by/v1/user/me",
+          method: "GET",
+          token: cookies.auth_token,
+          refreshToken,
+          logout,
         });
 
-        const data = await response.json();
-// console.log(data)
-        if (response.status === 498 || response.status === 403 ) {
-          logout()
-          return;
-        }
-
         if (!response.ok) {
-          setError(data.detail || "Ошибка получения пользователя");
+          notify({
+            title: "Ошибка",
+            message: data.detail || "Ошибка получения пользователя",
+            type: "danger",
+          });
         } else {
           setUserInfo(data);
         }
       } catch (err) {
-        setError("Ошибка сети");
+        notify({
+          title: "Ошибка",
+          message: "Ошибка сети: " + err,
+          type: "danger",
+        });
       }
     };
 
     getUserInfo();
-  }, [cookies.auth_token,   version]);
+  }, [cookies.auth_token, version]);
 
   return { userInfo, error, setError, refreshUserInfo };
 }

@@ -3,7 +3,10 @@ import { useCookies } from "react-cookie";
 import ErrorPopup from "../../../../Components/ErrorPopup/ErrorPopup";
 import InfoPopup from "../../../../Components/InfoPopup/InfoPopup";
 import { useLogout } from "../../../../hooks/useLogout";
-export default function GetReasonModal({ tenderID, setUnsuitableID ,getTenders}) {
+import { Store } from "react-notifications-component";
+import { notify } from "../../../../utils/notify";
+import { tryProtectedRequest } from "../../../../utils/tryProtectedRequest";
+export default function GetReasonModal({ tenderID, setUnsuitableID ,getTenders,refreshToken}) {
   const [reasonText, setReasonText] = useState("");
   const [cookies] = useCookies(["auth_token"]);
   const [error, setError] = useState("");
@@ -11,39 +14,52 @@ export default function GetReasonModal({ tenderID, setUnsuitableID ,getTenders})
   const [watchInfoPopup, setWatchInfoPopup] = useState(false);
   const logout = useLogout()
 
-  const markAsUnsuitable = async () => {
-    if (reasonText === "") {
-      setError("Пожалуйста, введите причину");
-      return;
-    }
+const markAsUnsuitable = async () => {
+  if (reasonText === "") {
+    notify({
+      title: "Предупреждение",
+      message: "Пожалуйста, введите причину",
+      type: "warning",
+    });
+    return;
+  }
 
-    const response = await fetch(
-      `https://tenderstest.dev.regiuslab.by/v1/user/tenders/${tenderID}/mark/unsuitable?reason=${reasonText}`,
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${cookies.auth_token}`,
-        },
-      }
-    );
+  try {
+    const { data, response } = await tryProtectedRequest({
+      url: `https://tendersiteapi.dev.regiuslab.by/v1/user/tenders/${tenderID}/mark/unsuitable?reason=${encodeURIComponent(
+        reasonText
+      )}`,
+      method: "POST",
+      token: cookies.auth_token,
+      refreshToken,
+      logout,
+    });
 
-    const data = await response.json();
-      if(response.status === 498 || response.status ===  403  ){
-      logout()
-    }
     if (!response.ok) {
-      setError(data.detail);
+      notify({
+        title: "Ошибка",
+        message: data.detail,
+        type: "danger",
+      });
       return;
     }
-    if (response.ok) {
-      setWatchInfoPopup(true); 
-      setInfoPopupText(data.message || "");
-      getTenders()
-    }
 
-    // console.log(data);
-  };
+    setWatchInfoPopup(true);
+    getTenders();
+
+    notify({
+      title: "Успешно",
+      message: data.message,
+      type: "success",
+    });
+  } catch (err) {
+    notify({
+      title: "Ошибка",
+      message: "Ошибка сети: " + err,
+      type: "danger",
+    });
+  }
+};
 
   useEffect(() => {
     if (watchInfoPopup && infoPopupText === "") {
@@ -53,7 +69,7 @@ export default function GetReasonModal({ tenderID, setUnsuitableID ,getTenders})
   }, [infoPopupText, watchInfoPopup]);
 
   return (
-    <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-999999999 h-screen flex ">
+    <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-99 h-screen flex ">
       {error !== "" && <ErrorPopup errText={error} setError={setError} />}
 
       {infoPopupText !== "" && (

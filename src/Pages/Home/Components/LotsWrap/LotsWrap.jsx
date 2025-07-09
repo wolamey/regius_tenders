@@ -19,7 +19,7 @@ const [showFull, setShowFull] = useState([])
   return (
     <div
       ref={ref}
-      className="lots-wrap bg-white p-[20px] rounded-2xl max-h-[172px] overflow-hidden relative"
+      className="lots-wrap bg-white p-[20px] rounded-2xl max-h-[250px] overflow-hidden relative"
     >
 
         {

@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@import 'hamburgers/dist/hamburgers.css';
+@import "hamburgers/dist/hamburgers.css";
+@import "react-notifications-component/dist/theme.css";
+@import "animate.css/animate.min.css";
 
 * {
   transition: 0.5s;
@@ -11,22 +13,49 @@
   font-weight: normal;
   font-style: normal;
 }
-.hamburger{
-      display: flex
-;
-    justify-content: center;
-    align-items: center;
+
+.rnc__notification-close-mark:after{
+  font-size: 26px;
+  font-weight: 100;
+}
+.rnc__notification-item{
+  box-shadow: none;
+  border-radius: 10px;
+
+}
+.rnc__notification-item--success {
+  background-color: #8fb373; 
+  border-left: 6px solid #646D5C; 
+}
+.rnc__notification-item--success .rnc__notification-timer{
+  background-color: #646D5C;
+}
+
+.rnc__notification-title{
+      font-size: 16px;
+      letter-spacing: 1px;
+}
+
+.rnc__notification-close-mark{
+    background-color: transparent !important
+}
+.hamburger {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 0;
 }
-.hamburger-inner, .hamburger-inner::before, .hamburger-inner::after{
-      width: 30px;
-          height: 2px;
+.hamburger-inner,
+.hamburger-inner::before,
+.hamburger-inner::after {
+  width: 30px;
+  height: 2px;
 }
 .hamburger-inner::before {
-    top: -8px;
+  top: -8px;
 }
 .hamburger-inner::after {
-    bottom: -8px;
+  bottom: -8px;
 }
 input {
   outline: none;
@@ -65,103 +94,97 @@ a {
   .btn-wrapper {
     display: flex;
     flex-direction: column;
-    
   }
-  .btn-wrapper button{
+  .btn-wrapper button {
     width: 100%;
   }
 }
 @media (max-width: 1300px) {
-
-.tender-main{
-display: flex;
-flex-direction: column;
-align-items: stretch;
-}
-.btn-wrapper{
-  flex-direction: row;
-  flex-wrap: nowrap;
-}
-.btn-wrapper button{
-
-}
-.sidebar{
-}
-.sidebar p{
-  white-space: nowrap;
-
-}
+  .tender-main {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-wrapper {
+    flex-direction: row;
+    flex-wrap: nowrap;
+  }
+  .btn-wrapper button {
+  }
+  .sidebar {
+  }
+  .sidebar p {
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 1024px) {
-.btn-wrapper{
-flex-wrap: wrap;
-}
-.showFilters{
-  display: flex;
-}
-
+  .btn-wrapper {
+    flex-wrap: wrap;
+  }
+  .showFilters {
+    display: flex;
+  }
 }
 
 @media (max-width: 550px) {
-.text-3xl{
-  font-size: 26px;
-}
-.tag{
-  font-size: 12px;
-}
-.filter_item{
-  padding: 3px 10px;
-  font-size: 14px;
-}
-.card{
-  padding: 15px;
-}
-.card-basic{
- align-items: start;
+  .text-3xl {
+    font-size: 26px;
+  }
+  .tag {
+    font-size: 12px;
+  }
+  .filter_item {
+    padding: 3px 10px;
+    font-size: 14px;
+  }
+  .card {
+    padding: 15px;
+  }
+  .card-basic {
+    align-items: start;
     margin: 20px 0 0 0;
-    display: grid
-;
-}
-   .tender-left{
+    display: grid;
+  }
+  .tender-left {
     gap: 0;
-  grid-template-columns: auto;
-   }
-   .card_info-item{
+    grid-template-columns: auto;
+  }
+  .card_info-item {
     margin: 0 0 10px 0;
-   }
-   .btn-wrapper{
+  }
+  .btn-wrapper {
     gap: 10px;
-   }
-   .btn-wrapper button{
+  }
+  .btn-wrapper button {
     font-size: 16px;
     padding: 5px 10px;
-   }
-   .btn-wrapper button svg{
-width: 20px;
-max-width: 20px;
-min-width: 0;
-   }
+  }
+  .btn-wrapper button svg {
+    width: 20px;
+    max-width: 20px;
+    min-width: 0;
+  }
 
-   .text-2xl {
+  .text-2xl {
     font-size: 20px;
-   }
-   .lots-wrap{
+  }
+  .lots-wrap {
     padding: 10px;
-   }
-   .settings_item_info{
+  }
+  .settings_item_info {
     font-size: 18px;
-   }
-   .filters{
+  }
+  .filters {
     display: flex;
     flex-wrap: wrap;
-   }
+  }
 
-   .text-6xl{
+  .text-6xl {
     font-size: 28px;
-   }
-   .big-button{
+  }
+  .big-button {
     padding: 10px;
     width: 100%;
-   }
+  }
 }

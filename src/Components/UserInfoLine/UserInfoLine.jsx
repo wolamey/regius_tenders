@@ -4,25 +4,33 @@ import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import { useCookies } from "react-cookie";
 import useUserInfo from "../../hooks/useUserInfo";
 
-export default function UserInfoLine({isSideBarHidden,setIsSideBarHidden,screenWidth}) {
-  const { userInfo, error, setError } = useUserInfo();
+export default function UserInfoLine({
+  isSideBarHidden,
+  setIsSideBarHidden,
+  screenWidth,
+  refreshToken
+}) {
+  const { userInfo, error, setError } = useUserInfo(refreshToken);
   if (error) setError(error);
   const [isActive, setIsActive] = useState(false);
   return (
-    <div className="bg-[#f6fcf2] p-[20px] w-full flex justify-between items-center shadow-2xl/7 z-999">
+    <div className="bg-[#f6fcf2] p-[20px] w-full flex justify-between items-center shadow-2xl/7 z-99">
       <div className="">
-
-
-        {screenWidth<1024 &&(
+        {screenWidth < 1024 && (
           <button
-      className={`hamburger hamburger--spin ${isActive ? 'is-active' : ''}`}
-      type="button"
-      onClick={() =>{ setIsActive(!isActive);setIsSideBarHidden(!isSideBarHidden) }}
-    >
-      <span className="hamburger-box">
-        <span className="hamburger-inner"></span>
-      </span>
-    </button>
+            className={`hamburger hamburger--spin ${
+              !isSideBarHidden ? "is-active" : ""
+            }`}
+            type="button"
+            onClick={() => {
+              setIsActive(!isActive);
+              setIsSideBarHidden(!isSideBarHidden);
+            }}
+          >
+            <span className="hamburger-box">
+              <span className="hamburger-inner"></span>
+            </span>
+          </button>
         )}
       </div>
       {error !== "" && <ErrorPopup errText={error} setError={setError} />}

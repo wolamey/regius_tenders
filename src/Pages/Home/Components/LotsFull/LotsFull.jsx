@@ -1,14 +1,14 @@
 import React from "react";
 
 export default function LotsFull({ lots, setShowFull }) {
-  console.log(lots.length);
+  // console.log(lots.length);
   return (
     <div
-      className="fixed inset-0 backdrop-blur-xs bg-[#646D5C]/50 z-[999999999] h-screen flex"
+      className="fixed inset-0 backdrop-blur-xs bg-[#646D5C]/50 z-[999] h-screen flex"
       onClick={() => setShowFull(false)} // для закрытия по клику снаружи
     >
       <div
-        className="bg-white max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col gap-[20px] max-h-[90vh] overflow-y-auto"
+        className="bg-white max-w-[70vh] m-auto w-full p-[30px] rounded-2xl flex flex-col gap-[20px] max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()} // чтобы клик внутри не закрывал
       >
                 <p className="text-2xl text-center">Лоты: {lots.length}</p>
@@ -17,7 +17,7 @@ export default function LotsFull({ lots, setShowFull }) {
           {lots.map((lot) => (
             <div
               key={lot.id}
-              className="bg-[#DDEDD1] p-[10px_15px] rounded-xl grid grid-cols-[1fr_4fr_1fr] text-sm"
+              className="bg-[#DDEDD1] p-[10px_15px] rounded-xl grid grid-cols-[1fr_4fr_1fr] text-sm gap-[20px]"
             >
               <span>{lot.id}</span>
               <span>{lot.name}</span>

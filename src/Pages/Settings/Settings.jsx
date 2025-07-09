@@ -6,9 +6,11 @@ import { useCookies } from "react-cookie";
 import { useLogout } from "../../hooks/useLogout";
 import InfoPopup from "../../Components/InfoPopup/InfoPopup";
 import ErrorPopup from "../../Components/ErrorPopup/ErrorPopup";
+import { notify } from "../../utils/notify";
+import { tryProtectedRequest } from "../../utils/tryProtectedRequest";
 
-export default function Settings() {
-  const { userInfo, error, setError, refreshUserInfo } = useUserInfo();
+export default function Settings({refreshToken}) {
+  const { userInfo, error, setError, refreshUserInfo } = useUserInfo(refreshToken);
   if (error) setError(error);
   const logout = useLogout();
 
@@ -49,7 +51,7 @@ export default function Settings() {
 
   useEffect(() => {
     if (userInfo) {
-      console.log(userInfo);
+      // console.log(userInfo);
       setUserAccountData({
         email: userInfo.email || "",
         password: "",
@@ -63,49 +65,55 @@ export default function Settings() {
     }
   }, [userInfo]);
 
-  const updateUserInfo = async () => {
-    setLoader(true);
 
-    try {
-      const sendData = {
-        email: userAccountData.email,
-        password: userAccountData.password,
-        phone_number: userAccountData.phone_number,
-        filter: filters,
-      };
+const updateUserInfo = async () => {
+  setLoader(true);
 
-      const response = await fetch(
-        "https://tenderstest.dev.regiuslab.by/v1/user/me",
-        {
-          method: "PATCH",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cookies.auth_token}`,
-          },
-          body: JSON.stringify(sendData),
-        }
-      );
+  try {
+    const sendData = {
+      email: userAccountData.email,
+      password: userAccountData.password,
+      phone_number: userAccountData.phone_number,
+      filter: filters,
+    };
 
-      const data = await response.json();
+    const { data, response } = await tryProtectedRequest({
+      url: "https://tendersiteapi.dev.regiuslab.by/v1/user/me",
+      method: "PATCH",
+      body: sendData,
+      token: cookies.auth_token,
+      refreshToken,
+      logout,
+    });
 
-      if (response.status === 498 || response.status === 403) {
-        return logout();
-      }
-
-      if (response.ok) {
-        setInfo("Данные успешно обновлены");
-        setAddInfo(false);
-        refreshUserInfo();
-      } else {
-        setError("Ошибка обновления данных");
-      }
-    } catch (err) {
-      setError("Произошла сетевая ошибка");
-    } finally {
-      setLoader(false);
+    if (!response.ok) {
+      notify({
+        title: "Ошибка",
+        message: "Ошибка обновления данных",
+        type: "danger",
+      });
+      return;
     }
-  };
+
+    notify({
+      title: "Успешно",
+      message: "Данные обновлены",
+      type: "success",
+    });
+
+    setAddInfo(false);
+    refreshUserInfo();
+  } catch (err) {
+    notify({
+      title: "Ошибка",
+      message: "Произошла сетевая ошибка",
+      type: "danger",
+    });
+  } finally {
+    setLoader(false);
+  }
+};
+
 
   const [showEmailPopup, setShowEmailPopup] = useState(false);
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
@@ -113,77 +121,99 @@ export default function Settings() {
   const [newPassword, setNewPassword] = useState("");
 
   // Update email
-  const updateEmail = async () => {
-    setLoader(true);
-    try {
-      const response = await fetch(
-        "https://tenderstest.dev.regiuslab.by/v1/user/me",
-        {
-          method: "PATCH",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cookies.auth_token}`,
-          },
-          body: JSON.stringify({ email: newEmail }),
-        }
-      );
-      if (response.status === 498 || response.status === 403) return logout();
-      const data = await response.json();
-      if (response.ok) {
-        setInfo("Email успешно обновлен");
-        refreshUserInfo();
-        setShowEmailPopup(false);
-      } else {
-        setErrorPop(data.message || "Ошибка обновления email");
-      }
-    } catch {
-      setErrorPop("Произошла сетевая ошибка");
-    } finally {
-      setLoader(false);
+
+const updateEmail = async () => {
+  setLoader(true);
+  try {
+    const { data, response } = await tryProtectedRequest({
+      url: "https://tendersiteapi.dev.regiuslab.by/v1/user/me",
+      method: "PATCH",
+      body: { email: newEmail },
+      token: cookies.auth_token,
+      refreshToken,
+      logout,
+    });
+
+    if (!response.ok) {
+      notify({
+        title: "Ошибка",
+        message: data.message || "Ошибка обновления email",
+        type: "danger",
+      });
+      return;
     }
-  };
+
+    notify({
+      title: "Успешно",
+      message: "Email успешно обновлен",
+      type: "success",
+    });
+
+    refreshUserInfo();
+    setShowEmailPopup(false);
+  } catch (err) {
+    notify({
+      title: "Ошибка",
+      message: "Произошла сетевая ошибка",
+      type: "danger",
+    });
+  } finally {
+    setLoader(false);
+  }
+};
+
 
   // Update password
-  const updatePassword = async () => {
-    setLoader(true);
-    try {
-      const response = await fetch(
-        "https://tenderstest.dev.regiuslab.by/v1/user/me",
-        {
-          method: "PATCH",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cookies.auth_token}`,
-          },
-          body: JSON.stringify({ password: newPassword }),
-        }
-      );
-      if (response.status === 498 || response.status === 403) return logout();
-      const data = await response.json();
-      if (response.ok) {
-        setInfo("Пароль успешно обновлен");
-        setShowPasswordPopup(false);
-      } else {
-        setErrorPop(data.message || "Ошибка обновления пароля");
-      }
-    } catch {
-      setErrorPop("Произошла сетевая ошибка");
-    } finally {
-      setLoader(false);
+
+const updatePassword = async () => {
+  setLoader(true);
+  try {
+    const { data, response } = await tryProtectedRequest({
+      url: "https://tendersiteapi.dev.regiuslab.by/v1/user/me",
+      method: "PATCH",
+      body: { password: newPassword },
+      token: cookies.auth_token,
+      refreshToken,
+      logout,
+    });
+
+    if (!response.ok) {
+      notify({
+        title: "Ошибка",
+        message: data.message || "Ошибка обновления пароля",
+        type: "danger",
+      });
+      return;
     }
-  };
+
+    notify({
+      title: "Успешно",
+      message: "Пароль успешно обновлен",
+      type: "success",
+    });
+
+    setShowPasswordPopup(false);
+  } catch (err) {
+    notify({
+      title: "Ошибка",
+      message: "Произошла сетевая ошибка",
+      type: "danger",
+    });
+  } finally {
+    setLoader(false);
+  }
+};
+
 
   return (
     <div className="flex flex-col gap-[40px] p-[20px]">
       {loader && <Loader isFull={true} />}
 
-      {info !== "" && <InfoPopup text={info} setInfo={setInfo} />}
+      {/* {info !== "" && <InfoPopup text={info} setInfo={setInfo} />} */}
 
       {error !== "" && <ErrorPopup text={errorPop} setError={setErrorPop} />}
       {showEmailPopup && (
-        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-999999999999 h-screen flex">
+        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-99 h-screen flex">
           <div className="bg-[#DDEDD1] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[20px]">
             <h3 className="text-2xl">Новый email</h3>
             <InputText
@@ -211,9 +241,8 @@ export default function Settings() {
         </div>
       )}
       {showPasswordPopup && (
-        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-999999999999 h-screen flex">
+        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-99 h-screen flex">
           <div className="bg-[#DDEDD1] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[20px]">
-
             <h3 className="text-2xl">Новый пароль</h3>
             <InputText
               placeholder="Введите новый пароль"
@@ -246,22 +275,28 @@ export default function Settings() {
 
             <div className="flex flex-col gap-[20px]">
               <div className="flex flex-col ">
-                <p className="text-[16px] opacity-65">Название компании:</p>
-                <p className="text-[22px] leading-6 settings_item_info">{userInfo.company_name}</p>
+                <p className="text-[16px] opacity-45">Название компании:</p>
+                <p className="text-[22px] leading-6 settings_item_info">
+                  {userInfo.company_name}
+                </p>
               </div>
               <div className="flex flex-col ">
-                <p className="text-[16px] opacity-65">Номер телефона</p>
-                <p className="text-[22px] leading-6 settings_item_info">{userInfo.phone_number}</p>
+                <p className="text-[16px] opacity-45">Номер телефона</p>
+                <p className="text-[22px] leading-6 settings_item_info">
+                  {userInfo.phone_number}
+                </p>
               </div>
               <div className="flex flex-col ">
-                <p className="text-[16px] opacity-65">Дата регистрации</p>
+                <p className="text-[16px] opacity-45">Дата регистрации</p>
                 <p className="text-[22px] leading-6 settings_item_info">
                   {userInfo.registration_date}
                 </p>
               </div>
               <div className="flex flex-col ">
-                <p className="text-[16px] opacity-65">Email</p>
-                <p className="text-[22px] leading-6 settings_item_info">{userInfo.email}</p>
+                <p className="text-[16px] opacity-45">Email</p>
+                <p className="text-[22px] leading-6 settings_item_info">
+                  {userInfo.email}
+                </p>
               </div>
 
               <div className="flex gap-[0px_20px] flex-wrap">
@@ -285,10 +320,6 @@ export default function Settings() {
                 </button>
               </div>
             </div>
-
-        
-
-        
           </div>
 
           {filterSum !== "" ? (
@@ -344,7 +375,7 @@ export default function Settings() {
       )}
 
       {addInfo && (
-        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-999 h-screen flex ">
+        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-99 h-screen flex ">
           <div className="bg-[#DDEDD1] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[30px]">
             <p className="text-2xl">Введите информацию фильтров</p>
             <div className="flex flex-col gap-[10px] w-full">

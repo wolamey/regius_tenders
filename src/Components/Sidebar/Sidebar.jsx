@@ -4,7 +4,13 @@ import icon1 from "../../assets/images/sidebarIcon1.svg";
 import { Link, useLocation } from "react-router-dom";
 import useUserInfo from "../../hooks/useUserInfo";
 import Loader from "../Loader/Loader";
-export default function Sidebar({ pageName,isSideBarHidden }) {
+export default function Sidebar({
+  pageName,
+  isSideBarHidden,
+  setIsSideBarHidden,
+  screenWidth,
+  refreshToken
+}) {
   const tabs = [
     {
       image: (
@@ -89,14 +95,19 @@ export default function Sidebar({ pageName,isSideBarHidden }) {
   const location = useLocation();
   const path = location.pathname;
 
+  useEffect(() => {
+    if (screenWidth < 1024) setIsSideBarHidden(true);
+  }, [path]);
 
-
-  const { userInfo, error, setError } = useUserInfo();
+  const { userInfo, error, setError } = useUserInfo(refreshToken);
   if (error) setError(error);
   // console.log(userInfo);
   return (
-    <div className={`${isSideBarHidden? 'w-0 min-w-0 ' : 'w-[250px] min-w-[250px]  p-[20px] '} h-screen bg-[#646D5C] flex flex-col justify-between sidebar transition-all duration-500 ease-in-out overflow-hidden`}>
-      
+    <div
+      className={`${
+        isSideBarHidden ? "w-0 min-w-0 " : "w-[250px] min-w-[250px]  p-[20px] "
+      } h-screen bg-[#646D5C] flex flex-col justify-between sidebar transition-all duration-500 ease-in-out overflow-hidden`}
+    >
       <div className="">
         <p className="text-3xl text-white mb-[40px]">{pageName}</p>
 

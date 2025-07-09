@@ -13,10 +13,13 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.10",
+    "animate.css": "^4.1.1",
     "hamburgers": "^1.2.1",
     "react": "^19.1.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.1.0",
+    "react-fast-marquee": "^1.6.5",
+    "react-notifications-component": "^4.0.1",
     "react-router-dom": "^7.6.2",
     "tailwindcss": "^4.1.10"
   },
