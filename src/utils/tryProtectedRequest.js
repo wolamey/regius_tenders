@@ -27,7 +27,7 @@ export async function tryProtectedRequest({
   const response = await fetch(url, requestConfig);
   const data = await response.json();
 
-  if (response.status === 404 && !retry) {
+  if (response.status === 404 || response.status === 401 && !retry) {
     const newToken = await refreshToken();
     if (!newToken) return logout();
 
