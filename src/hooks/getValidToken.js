@@ -23,6 +23,7 @@ export function useValidToken() {
 
       const data = await response.json();
 
+      console.log(data)
       setCookie("auth_token", data.access_token, {
         path: "/regius_tenders",
         maxAge: 3600,
