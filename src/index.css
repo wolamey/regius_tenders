@@ -13,31 +13,55 @@
   font-weight: normal;
   font-style: normal;
 }
+.text-gradient {
+  background: linear-gradient(90deg, #000 68.27%, rgba(0, 0, 0, 0) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-.rnc__notification-close-mark:after{
+
+.rnc__notification-container--bottom-right {
+  bottom: 140px !important;
+}
+@media (max-width: 500px) {
+  .rnc__notification-container--bottom-right {
+    min-width: 250px;
+    width: 250px;
+  }
+  .rnc__notification-item {
+    min-width: 250px;
+    width: 250px;
+  }
+  .rnc__notification-container--bottom-right {
+  top: 20px !important;
+  bottom: auto !important;
+}
+}
+
+.rnc__notification-close-mark:after {
   font-size: 26px;
   font-weight: 100;
 }
-.rnc__notification-item{
+.rnc__notification-item {
   box-shadow: none;
   border-radius: 10px;
-
 }
 .rnc__notification-item--success {
-  background-color: #8fb373; 
-  border-left: 6px solid #646D5C; 
+  background-color: #8fb373;
+  border-left: 6px solid #646d5c;
 }
-.rnc__notification-item--success .rnc__notification-timer{
-  background-color: #646D5C;
-}
-
-.rnc__notification-title{
-      font-size: 16px;
-      letter-spacing: 1px;
+.rnc__notification-item--success .rnc__notification-timer {
+  background-color: #646d5c;
 }
 
-.rnc__notification-close-mark{
-    background-color: transparent !important
+.rnc__notification-title {
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.rnc__notification-close-mark {
+  background-color: transparent !important;
 }
 .hamburger {
   display: flex;

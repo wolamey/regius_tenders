@@ -453,7 +453,7 @@ export default function Home({ refreshToken }) {
           </p>
         ) : tenders.length !== 0 ? (
           <div className=" ">
-          <div className=" flex flex-col gap-[30px] p-[20px]">
+          <div className=" flex flex-col gap-[30px] 	sm:p-[20px] ">
             {tenders.map((item, index) => (
               <div
                 className="bg-[#F6FCF2] p-[30px] rounded-lg relative flex flex-col gap-[30px] card "
@@ -504,7 +504,7 @@ export default function Home({ refreshToken }) {
                   <div className="flex justify-between w-full items-center flex-wrap gap-[10px_20px] card-basic">
                     <Link
                       to={item.link}
-                      className="flex gap-[5px] text-[#646D5C] "
+                      className=" text-gradient flex gap-[5px] text-[#646D5C] whitespace-nowrap  overflow-hidden text-ellipsis"
                     >
                       <img src={linkSvg} alt="" className="w-[15px] " />
                       {item.link}
@@ -621,7 +621,7 @@ export default function Home({ refreshToken }) {
           disabled={page === 1}
           className="px-3 py-1 border-2 border-[#646D5C] rounded-lg disabled:opacity-50  hover:bg-[#F0F6EB]"
         >
-          ← Prev
+          ←
         </button>
 
         {Array.from({ length: totalPages }, (_, idx) => idx + 1)
@@ -643,7 +643,7 @@ export default function Home({ refreshToken }) {
           disabled={page === totalPages}
           className="px-3 py-1 border-[#646D5C] border-2 rounded-lg disabled:opacity-50  hover:bg-[#F0F6EB]"
         >
-          Next →
+           →
         </button>
       </div>
           </div>

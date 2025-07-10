@@ -1,6 +1,6 @@
 import { Store } from 'react-notifications-component';
 
-export const notify = ({ title, message, type = 'default', duration = 10000 }) => {
+export const notify = ({ title, message, type = 'default', duration = 5000 }) => {
 setTimeout(() => {
 
   Store.addNotification({
@@ -19,6 +19,6 @@ setTimeout(() => {
       click: true,
     },
   });
-}, 250);
+}, 400);
 
 };
