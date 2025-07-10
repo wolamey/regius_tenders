@@ -8,8 +8,9 @@ import { CookiesProvider, useCookies } from "react-cookie";
 import Settings from "../Pages/Settings/Settings";
 import { HashRouter } from "react-router-dom";
 import { ReactNotifications, Store } from "react-notifications-component";
+import RequireAuth from "../Components/RequireAuth/RequireAuth";
 function App() {
-  const [cookies, setCookie] = useCookies(["auth_token", "refresh_token"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["auth_token", "refresh_token"]);
 
   const refreshToken = async () => {
     const refresh = cookies.refresh_token;
@@ -54,26 +55,30 @@ function App() {
   return (
     <div className="app">
       <ReactNotifications />
-      <Routes>
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/settings"
-          element={
-            <Layout refreshToken={refreshToken} pageName={"Настройки"}>
-              <Settings refreshToken={refreshToken} />
-            </Layout>
-          }
-        />
+        <Routes>
+      <Route path="/auth"    element={<Auth />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* всё, что ниже — только для авторизованных */}
+      <Route element={<RequireAuth />}>
         <Route
           path="/"
           element={
-            <Layout refreshToken={refreshToken} pageName={"Тендеры"}>
+            <Layout refreshToken={refreshToken} pageName="Тендеры">
               <Home refreshToken={refreshToken} />
             </Layout>
           }
         />
-      </Routes>
+        <Route
+          path="/settings"
+          element={
+            <Layout refreshToken={refreshToken} pageName="Настройки">
+              <Settings refreshToken={refreshToken} />
+            </Layout>
+          }
+        />
+      </Route>
+    </Routes>
     </div>
   );
 }

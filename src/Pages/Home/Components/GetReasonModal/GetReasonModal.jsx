@@ -8,7 +8,7 @@ import { notify } from "../../../../utils/notify";
 import { tryProtectedRequest } from "../../../../utils/tryProtectedRequest";
 export default function GetReasonModal({ tenderID, setUnsuitableID ,getTenders,refreshToken}) {
   const [reasonText, setReasonText] = useState("");
-  const [cookies] = useCookies(["auth_token"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["auth_token"]);
   const [error, setError] = useState("");
   const [infoPopupText, setInfoPopupText] = useState("");
   const [watchInfoPopup, setWatchInfoPopup] = useState(false);

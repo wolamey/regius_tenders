@@ -5,7 +5,7 @@ import { notify } from "../utils/notify";
 import { tryProtectedRequest } from "../utils/tryProtectedRequest";
 
 export default function useUserInfo(refreshToken) {
-  const [cookies] = useCookies(["auth_token"]);
+  const [cookies, setCookie, removeCookie]= useCookies(["auth_token"]);
   const [userInfo, setUserInfo] = useState(null);
   const [error, setError] = useState("");
   const [version, setVersion] = useState(0);

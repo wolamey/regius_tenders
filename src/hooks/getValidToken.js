@@ -2,7 +2,7 @@
 import { useCookies } from "react-cookie";
 
 export function useValidToken() {
-  const [cookies, setCookie] = useCookies(["auth_token", "refresh_token"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["auth_token", "refresh_token"]);
 
   const getValidToken = async (status) => {
     if (status !== 404) return cookies.auth_token;

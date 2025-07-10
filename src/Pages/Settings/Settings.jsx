@@ -15,7 +15,7 @@ export default function Settings({refreshToken}) {
   const logout = useLogout();
 
   const [filters, setFilters] = useState({});
-  const [cookies] = useCookies(["auth_token"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["auth_token"]);
   const [loader, setLoader] = useState(false);
   const [info, setInfo] = useState("");
   const [addInfo, setAddInfo] = useState(false);

@@ -18,7 +18,7 @@ import { notify } from "../../utils/notify";
 import { tryProtectedRequest } from "../../utils/tryProtectedRequest";
 export default function Home({ refreshToken }) {
   const [error, setError] = useState("");
-  const [cookies] = useCookies(["auth_token"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["auth_token"]);
   const [tenders, setTenders] = useState([]);
   const [filters, setFilters] = useState({
     status: "",
@@ -49,12 +49,17 @@ export default function Home({ refreshToken }) {
 
   const logout = useLogout();
 
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 20;
+  const [totalPages, setTotalPages] = useState(1);
+
   const getTenders = async () => {
     setTendersLoader(true);
-    const params = new URLSearchParams({});
-    if (filters.status !== "") params.set("user_status", filters.status);
-    if (filters.platform !== "")
-      params.set("platform_status", filters.platform);
+    const params = new URLSearchParams();
+    if (filters.status) params.set("user_status", filters.status);
+    if (filters.platform) params.set("platform_status", filters.platform);
+    params.set("page", page);
+    params.set("page_size", PAGE_SIZE);
 
     try {
       const { data, response } = await tryProtectedRequest({
@@ -66,31 +71,29 @@ export default function Home({ refreshToken }) {
       });
 
       if (!response.ok) {
-        notify({
-          title: "Ошибка",
-          message: data.detail,
-          type: "danger",
-        });
+        notify({ title: "Ошибка", message: data.detail, type: "danger" });
         return;
       }
-console.log(data)
-      setTenders(data.tenders || 0);
+
+      setTenders(data.tenders);
+      setTotalPages(data.total_pages);
     } catch (err) {
-      notify({
-        title: "Ошибка",
-        message: err,
-        type: "danger",
-      });
+      const msg = err instanceof Error ? err.message : String(err);
+      // setError(msg);
+      notify({ title: "Ошибка", message: msg, type: "danger" });
     } finally {
-      setTimeout(() => {
-        setTendersLoader(false);
-      }, 300);
+      setTendersLoader(false);
     }
   };
 
+  // reload on filters or page change
   useEffect(() => {
     getTenders();
-  }, [filters]);
+  }, [filters, page]);
+
+  const onPrev = () => setPage((p) => Math.max(1, p - 1));
+  const onNext = () => setPage((p) => Math.min(totalPages, p + 1));
+  const onSelectPage = (p) => setPage(p);
 
   const copyToClipboard = async (text) => {
     try {
@@ -154,40 +157,40 @@ console.log(data)
     getTenders();
   };
 
-const MarkAsTakenIntoWork = async (tenderID) => {
-  try {
-    const { data, response } = await tryProtectedRequest({
-      url: `https://tendersiteapi.dev.regiuslab.by/v1/user/tenders/${tenderID}/mark/taken_into_work`,
-      method: "POST",
-      token: cookies.auth_token,
-      refreshToken,
-      logout,
-    });
+  const MarkAsTakenIntoWork = async (tenderID) => {
+    try {
+      const { data, response } = await tryProtectedRequest({
+        url: `https://tendersiteapi.dev.regiuslab.by/v1/user/tenders/${tenderID}/mark/taken_into_work`,
+        method: "POST",
+        token: cookies.auth_token,
+        refreshToken,
+        logout,
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
+        notify({
+          title: "Ошибка",
+          message: data.detail,
+          type: "danger",
+        });
+        return;
+      }
+
+      notify({
+        title: "Успешно",
+        message: data.message,
+        type: "success",
+      });
+
+      getTenders();
+    } catch (err) {
       notify({
         title: "Ошибка",
-        message: data.detail,
+        message: err,
         type: "danger",
       });
-      return;
     }
-
-    notify({
-      title: "Успешно",
-      message: data.message,
-      type: "success",
-    });
-
-    getTenders();
-  } catch (err) {
-    notify({
-      title: "Ошибка",
-      message: err,
-      type: "danger",
-    });
-  }
-};
+  };
   const getUserStatuses = async () => {
     try {
       const response = await fetch(
@@ -449,138 +452,151 @@ const MarkAsTakenIntoWork = async (tenderID) => {
             К сожалению, по данным фильтрам тендера не найдены :(
           </p>
         ) : tenders.length !== 0 ? (
-          tenders.map((item, index) => (
-            <div
-              className="bg-[#F6FCF2] p-[30px] rounded-lg relative flex flex-col gap-[30px] card"
-              key={index}
-            >
-              <div className=" absolute  top-[-10px] right-[-10px] flex gap-[10px] ">
-                <div
-                  className={`${
-                    item.status === "open"
-                      ? "bg-[#F7FFD7] text-[#817925] border-[#dbd415]"
-                      : item.status === "work"
-                      ? "bg-[#ECECEC] text-[#545454] border-[#707070]"
-                      : item.status === "completed"
-                      ? "bg-[#E4FFD7] text-[#3D6821] border-[#5FB059]"
-                      : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
-                  } border-2 rounded-2xl w-fit p-[0_15px] tag `}
-                >
-                  {item.status === "open"
-                    ? "Подача документов"
-                    : item.status === "work"
-                    ? "Работа комиссии"
-                    : item.status === "completed"
-                    ? "Завершен"
-                    : "Отменен"}
-                </div>
-                <div
-                  className={`${
-                    item.user_status === "not_reviewed"
-                      ? "bg-[#F7FFD7] text-[#817925] border-[#dbd415]"
-                      : item.user_status === "taken_into_work"
-                      ? "bg-[#ECECEC] text-[#545454] border-[#707070]"
-                      : item.user_status === "suitable"
-                      ? "bg-[#E4FFD7] text-[#3D6821] border-[#5FB059]"
-                      : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
-                  } border-2 rounded-2xl w-fit p-[0_15px]  tag`}
-                >
-                  {item.user_status === "not_reviewed"
-                    ? "Не рассмотрен"
-                    : item.user_status === "suitable"
-                    ? "Подходящий"
-                    : item.user_status === "Подходящий"
-                    ? "Не подходящий"
-                    : "Взят в работу"}
-                </div>
-              </div>
-              <div className="flex flex-col ">
-                <p className="text-3xl font-medium  mb-[30px]">{item.name}</p>
-                <div className="flex justify-between w-full items-center flex-wrap gap-[10px_20px] card-basic">
-                  <Link
-                    to={item.link}
-                    className="flex gap-[5px] text-[#646D5C] "
-                  >
-                    <img src={linkSvg} alt="" className="w-[15px] " />
-                    {item.link}
-                  </Link>
+          <div className=" ">
+          <div className=" flex flex-col gap-[30px] p-[20px]">
+            {tenders.map((item, index) => (
+              <div
+                className="bg-[#F6FCF2] p-[30px] rounded-lg relative flex flex-col gap-[30px] card "
+                key={index}
+              >
+                <div className=" absolute  top-[-10px] right-[-10px] flex gap-[10px] ">
                   <div
-                    onClick={() => copyToClipboard(item.tender_number)}
-                    className="flex gap-[5px] cursor-pointer group"
+                    className={`${
+                      item.status === "open"
+                        ? "bg-[#F7FFD7] text-[#817925] border-[#dbd415]"
+                        : item.status === "work"
+                        ? "bg-[#ECECEC] text-[#545454] border-[#707070]"
+                        : item.status === "completed"
+                        ? "bg-[#E4FFD7] text-[#3D6821] border-[#5FB059]"
+                        : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
+                    } border-2 rounded-2xl w-fit p-[0_15px] tag `}
                   >
-                    <img src={copySvg} alt="" className="w-[15px]" />
-                    <p className="group-hover:text-[#646D5C]">
-                      {item.tender_number}
-                    </p>
+                    {item.status === "open"
+                      ? "Подача документов"
+                      : item.status === "work"
+                      ? "Работа комиссии"
+                      : item.status === "completed"
+                      ? "Завершен"
+                      : "Отменен"}
                   </div>
-                  <div className="flex flex-col">
-                    <p className="text-m text-black/60">Сумма:</p>
-                    <p className=" text-xl font-extrabold">
-                      {getFinalAmount(item.lots)} {item.lots[0].currency}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-[5px] items-center">
-                    <img src={watchSvg} className="w-[18px]" alt="" />
-
-                    <p className="text-xl text-[#646D5C]">
-                      {getRemDays(item.end_date)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className=" grid grid-cols-[2fr_3fr] gap-[30px] items-end tender-main">
-                <div className="grid grid-cols-[auto_3fr] gap-[10px_25px] items-center tender-left">
-                  <p className="text-m text-black/60"> Заказчик:</p>
-                  <p className="card_info-item">{item.customer_name}</p>
-                  <p className="text-m text-black/60">Платформа:</p>
-                  <p className="card_info-item">{item.platform.name}</p>
-                  <p className="text-m text-black/60">Даты подачи:</p>
-                  <p className="card_info-item">
-                    {formatDateOnly(item.start_date)} -{" "}
-                    {formatDateOnly(item.end_date)}
-                  </p>
-
-                  <div className="col-span-full flex flex-wrap gap-[15px] pt-[15px] btn-wrapper ">
-                    <button
-                      onClick={() => markAsSuitable(item.user_tender_id)}
-                      className={`${
-                        item.user_status === "suitable"
-                          ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
-                          : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
-                      } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full  sm:w-[calc(50%-7.5px)] min-w-[200px] `}
-                    >
-                      <LikeIcon className="item-button-svg" />
-                      Подходящий
-                    </button>
-
-                    <button
-                      onClick={() => setUnsuitableID(item.user_tender_id)}
-                      className={`${
-                        item.user_status === "unsuitable"
-                          ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
-                          : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
-                      } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full sm:w-[calc(50%-7.5px)] min-w-[200px]`}
-                    >
-                      <Dislike className="item-button-svg" />
-                      Не подходящий
-                    </button>
-
-                    <button
-                      onClick={() => MarkAsTakenIntoWork(item.user_tender_id)}
-                      className={`${
-                        item.user_status === "taken_into_work"
-                          ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
-                          : "bg-[#646d5c]/10 hover:bg-[#646d5c]/20 text-[#646d5c] border-[#646d5c]"
-                      } button-suitable col-span-full flex w-full items-center justify-center gap-[5px] rounded-xl border-2 p-[10px_25px] text-[20px] whitespace-nowrap`}
-                    >
-                      <WorkImg className="item-button-svg" />В работу
-                    </button>
+                  <div
+                    className={`${
+                      item.user_status === "not_reviewed"
+                        ? "bg-[#F7FFD7] text-[#817925] border-[#dbd415]"
+                        : item.user_status === "taken_into_work"
+                        ? "bg-[#ECECEC] text-[#545454] border-[#707070]"
+                        : item.user_status === "suitable"
+                        ? "bg-[#E4FFD7] text-[#3D6821] border-[#5FB059]"
+                        : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
+                    } border-2 rounded-2xl w-fit p-[0_15px]  tag`}
+                  >
+                    {item.user_status === "not_reviewed"
+                      ? "Не рассмотрен"
+                      : item.user_status === "suitable"
+                      ? "Подходящий"
+                      : item.user_status === "Подходящий"
+                      ? "Не подходящий"
+                      : "Взят в работу"}
                   </div>
                 </div>
-                <LotsWrap lots={item.lots} index={index} />
-                {/* <div className="lots-wrap bg-white p-[20px] rounded-2xl  overflow-hidden relative">
+                <div className="flex flex-col ">
+                  <p className="text-3xl font-medium  mb-[30px]">{item.name}</p>
+                  <div className="flex justify-between w-full items-center flex-wrap gap-[10px_20px] card-basic">
+                    <Link
+                      to={item.link}
+                      className="flex gap-[5px] text-[#646D5C] "
+                    >
+                      <img src={linkSvg} alt="" className="w-[15px] " />
+                      {item.link}
+                    </Link>
+                    <div
+                      onClick={() => copyToClipboard(item.tender_number)}
+                      className="flex gap-[5px] cursor-pointer group"
+                    >
+                      <img src={copySvg} alt="" className="w-[15px]" />
+                      <p className="group-hover:text-[#646D5C]">
+                        {item.tender_number}
+                      </p>
+                    </div>
+                    <div className="flex flex-col">
+                      <p className="text-m text-black/60 ">Сумма:</p>
+                      <p className=" text-xl font-extrabold">
+                        {getFinalAmount(item.lots)} {item.lots[0].currency}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-[5px] items-center">
+                      <img src={watchSvg} className="w-[18px]" alt="" />
+
+                      <p className="text-xl text-[#646D5C]">
+                        {getRemDays(item.end_date)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className=" grid grid-cols-[2fr_3fr] gap-[30px] items-end tender-main">
+                  <div className="grid grid-cols-[auto_3fr] gap-[0px_25px] items-center tender-left">
+                    <p className="text-m text-black/60 col-span-full">
+                      {" "}
+                      Заказчик:
+                    </p>
+                    <p className="card_info-item col-span-full mb-[15px]">
+                      {item.customer_name}
+                    </p>
+                    <p className="text-m text-black/60 col-span-full">
+                      Платформа:
+                    </p>
+                    <p className="card_info-item col-span-full  mb-[15px]">
+                      {item.platform.name}
+                    </p>
+                    <p className="text-m text-black/60 col-span-full">
+                      Даты подачи:
+                    </p>
+                    <p className="card_info-item col-span-full  mb-[15px]">
+                      {formatDateOnly(item.start_date)} -{" "}
+                      {formatDateOnly(item.end_date)}
+                    </p>
+
+                    <div className="col-span-full flex flex-wrap gap-[15px] pt-[15px] btn-wrapper ">
+                      <button
+                        onClick={() => markAsSuitable(item.user_tender_id)}
+                        className={`${
+                          item.user_status === "suitable"
+                            ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                            : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
+                        } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full  sm:w-[calc(50%-7.5px)] min-w-[200px] `}
+                      >
+                        <LikeIcon className="item-button-svg" />
+                        Подходящий
+                      </button>
+
+                      <button
+                        onClick={() => setUnsuitableID(item.user_tender_id)}
+                        className={`${
+                          item.user_status === "unsuitable"
+                            ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                            : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
+                        } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full sm:w-[calc(50%-7.5px)] min-w-[200px]`}
+                      >
+                        <Dislike className="item-button-svg" />
+                        Не подходящий
+                      </button>
+
+                      <button
+                        onClick={() => MarkAsTakenIntoWork(item.user_tender_id)}
+                        className={`${
+                          item.user_status === "taken_into_work"
+                            ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                            : "bg-[#646d5c]/10 hover:bg-[#646d5c]/20 text-[#646d5c] border-[#646d5c]"
+                        } button-suitable col-span-full flex w-full items-center justify-center gap-[5px] rounded-xl border-2 p-[10px_25px] text-[20px] whitespace-nowrap`}
+                      >
+                        <WorkImg className="item-button-svg" />В работу
+                      </button>
+                    </div>
+                  </div>
+                  <LotsWrap lots={item.lots} index={index} />
+                  {/* <div className="lots-wrap bg-white p-[20px] rounded-2xl  overflow-hidden relative">
                   <div className="absolute bottom-0 bg-fade-white h-[70px] w-full"></div>
                   <p className="text-2xl mb-[20px]">Лоты: {item.lots.length}</p>
                   <div className="flex gap-[10px] flex-wrap ">
@@ -594,15 +610,51 @@ const MarkAsTakenIntoWork = async (tenderID) => {
                     ))}
                   </div>
                 </div> */}
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
+
+              <div className="flex justify-center items-center gap-3 py-4">
+        <button
+          onClick={onPrev}
+          disabled={page === 1}
+          className="px-3 py-1 border-2 border-[#646D5C] rounded-lg disabled:opacity-50  hover:bg-[#F0F6EB]"
+        >
+          ← Prev
+        </button>
+
+        {Array.from({ length: totalPages }, (_, idx) => idx + 1)
+          .slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))
+          .map((p) => (
+            <button
+              key={p}
+              onClick={() => onSelectPage(p)}
+              className={`px-3 py-1 border-2 border-[#646D5C] rounded-lg ${
+                p === page ? "bg-[#646D5C] text-white" : " hover:bg-[#F0F6EB]"
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+
+        <button
+          onClick={onNext}
+          disabled={page === totalPages}
+          className="px-3 py-1 border-[#646D5C] border-2 rounded-lg disabled:opacity-50  hover:bg-[#F0F6EB]"
+        >
+          Next →
+        </button>
+      </div>
+          </div>
         ) : (
           <div className="m-auto">
             <Loader isFull={false} color={"#646D5C"} />
           </div>
         )}
       </div>
+
+  
     </div>
   );
 }

@@ -10,7 +10,7 @@ import Marquee from "react-fast-marquee";
 
 export default function Register() {
   const [error, setError] = useState("");
-  const [cookies, setCookie] = useCookies(["auth_token", "user_email"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["auth_token", "user_email"]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({

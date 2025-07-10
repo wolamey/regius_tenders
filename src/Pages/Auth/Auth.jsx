@@ -13,7 +13,7 @@ export default function Auth() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const [cookies, setCookie] = useCookies(["auth_token", "user_email"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["auth_token", "user_email"]);
   const handleSubmit = async (e) => {
     setLoading(true);
 
