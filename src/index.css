@@ -13,6 +13,16 @@
   font-weight: normal;
   font-style: normal;
 }
+.rfm-child{
+    pointer-events: none;
+user-select: none;
+  div{
+  pointer-events: none;
+user-select: none;
+  }
+}
+
+
 .text-gradient {
   background: linear-gradient(90deg, #000 68.27%, rgba(0, 0, 0, 0) 100%);
   background-clip: text;
