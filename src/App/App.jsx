@@ -1,17 +1,47 @@
-import { useState } from "react";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { HashRouter, Routes, Route } from "react-router-dom";
+import { CookiesProvider, useCookies } from "react-cookie";
+import { ReactNotifications } from "react-notifications-component";
+
 import Auth from "../Pages/Auth/Auth";
 import Register from "../Pages/Register/Register";
 import Layout from "../Components/Layout/Layout";
 import Home from "../Pages/Home/Home";
-import { CookiesProvider, useCookies } from "react-cookie";
 import Settings from "../Pages/Settings/Settings";
-import { HashRouter } from "react-router-dom";
-import { ReactNotifications, Store } from "react-notifications-component";
 import RequireAuth from "../Components/RequireAuth/RequireAuth";
-function App() {
-  const [cookies, setCookie, removeCookie] = useCookies(["auth_token", "refresh_token"]);
 
+
+// Компонент для подгрузки Bitrix24-чата
+const BitrixScript = () => {
+  useEffect(() => {
+    const selector = 
+      'script[src^="https://cdn-ru.bitrix24.by/b30573366/crm/site_button/loader_4_myjcfv.js"]';
+
+    // Если скрипта ещё нет — добавляем
+    if (!document.querySelector(selector)) {
+      const script = document.createElement("script");
+      script.async = true;
+      script.src =
+        "https://cdn-ru.bitrix24.by/b30573366/crm/site_button/loader_4_myjcfv.js?" +
+        ((Date.now() / 60000) | 0);
+      document.body.appendChild(script);
+    }
+
+    // При размонтировании — удаляем
+    return () => {
+      const script = document.querySelector(selector);
+      if (script) document.body.removeChild(script);
+    };
+  }, []);
+
+  return null;
+};
+
+
+const App = () => {
+  const [cookies, setCookie] = useCookies(["auth_token", "refresh_token"]);
+
+  // Функция для обновления токена
   const refreshToken = async () => {
     const refresh = cookies.refresh_token;
     if (!refresh) return null;
@@ -24,27 +54,19 @@ function App() {
           headers: { Accept: "application/json" },
         }
       );
-
       if (!response.ok) return null;
 
       const data = await response.json();
-      console.log(data);
-      if (!data) {
-      console.log("рефреш не получится");
+      if (!data) return null;
 
-        return;
-      }
       setCookie("auth_token", data.access_token, {
         path: "/regius_tenders",
         maxAge: 3600,
       });
-
       setCookie("refresh_token", data.refresh_token, {
         path: "/regius_tenders",
         maxAge: 86400,
       });
-
-      console.log("рефреш");
 
       return data.access_token;
     } catch (err) {
@@ -52,35 +74,44 @@ function App() {
       return null;
     }
   };
-  return (
-    <div className="app">
-      <ReactNotifications />
-        <Routes>
-      <Route path="/auth"    element={<Auth />} />
-      <Route path="/register" element={<Register />} />
 
-      {/* всё, что ниже — только для авторизованных */}
-      <Route element={<RequireAuth />}>
-        <Route
-          path="/"
-          element={
-            <Layout refreshToken={refreshToken} pageName="Тендеры">
-              <Home refreshToken={refreshToken} />
-            </Layout>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <Layout refreshToken={refreshToken} pageName="Настройки">
-              <Settings refreshToken={refreshToken} />
-            </Layout>
-          }
-        />
-      </Route>
-    </Routes>
-    </div>
+  return (
+        <div className="app">
+          <ReactNotifications />
+
+          <Routes>
+            {/* Публичные страницы */}
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/register" element={<Register />} />
+
+            {/* Защищённые маршруты — только для авторизованных */}
+            <Route element={<RequireAuth />}>
+              <Route
+                path="/"
+                element={
+                  <>
+                    <BitrixScript />
+                    <Layout refreshToken={refreshToken} pageName="Тендеры">
+                      <Home refreshToken={refreshToken} />
+                    </Layout>
+                  </>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <>
+                    <BitrixScript />
+                    <Layout refreshToken={refreshToken} pageName="Настройки">
+                      <Settings refreshToken={refreshToken} />
+                    </Layout>
+                  </>
+                }
+              />
+            </Route>
+          </Routes>
+        </div>
   );
-}
+};
 
 export default App;
