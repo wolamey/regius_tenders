@@ -136,6 +136,7 @@ export default function Auth() {
           <input
             type="submit"
             className="button auth_submit w-fit m-auto pl-[40px] pr-[40px] pt-[20px] pb-[20px] bg-[#93A188] border-2  border-transparent cursor-pointer rounded-md text-white uppercase text-xl hover:bg-transparent hover:border-2 hover:border-[#93A188] hover:text-[#93A188] big-button"
+            value={'Войти'}
           />
           <Link
             to="/register"

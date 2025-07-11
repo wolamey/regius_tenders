@@ -3,12 +3,14 @@ import { useCookies } from "react-cookie";
 import { useLogout } from "./useLogout";
 import { notify } from "../utils/notify";
 import { tryProtectedRequest } from "../utils/tryProtectedRequest";
+import Loader from "../Components/Loader/Loader";
 
 export default function useUserInfo(refreshToken) {
   const [cookies, setCookie, removeCookie]= useCookies(["auth_token"]);
   const [userInfo, setUserInfo] = useState(null);
   const [error, setError] = useState("");
   const [version, setVersion] = useState(0);
+const [loader, setLoader] = useState(false)
 
   const refreshUserInfo = () => setVersion((v) => v + 1);
   const logout = useLogout();
@@ -32,6 +34,18 @@ export default function useUserInfo(refreshToken) {
           });
         } else {
           setUserInfo(data);
+
+          if(!data.is_active) {
+            setLoader(true)
+           notify({
+            title: "Вы еще не активированы",
+            message: 'Мы активируем ваш аккаунт в течение 24 часов. Пожалуйста, приходите позже.',
+            type: "danger",
+          duration: 0,
+
+          });
+          return 
+          }
         }
       } catch (err) {
         notify({
@@ -45,5 +59,5 @@ export default function useUserInfo(refreshToken) {
     getUserInfo();
   }, [cookies.auth_token, version]);
 
-  return { userInfo, error, setError, refreshUserInfo };
+  return { userInfo, error, setError, refreshUserInfo, loader };
 }

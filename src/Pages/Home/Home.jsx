@@ -29,23 +29,20 @@ export default function Home({ refreshToken }) {
   const [userStatustes, setUserStatuses] = useState(null);
   const [platformStatustes, setPlatformStatuses] = useState(null);
   const [tendersLoader, setTendersLoader] = useState(false);
-
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [isFiltersHidden, setIsFiltersHidden] = useState(false);
 
-
-      (function (w, d, u) {
-        var s = d.createElement("script");
-        s.async = true;
-        s.src = u + "?" + ((Date.now() / 60000) | 0);
-        var h = d.getElementsByTagName("script")[0];
-        h.parentNode.insertBefore(s, h);
-      })(
-        window,
-        document,
-        "https://cdn-ru.bitrix24.by/b30573366/crm/site_button/loader_4_myjcfv.js"
-      );
-
+  (function (w, d, u) {
+    var s = d.createElement("script");
+    s.async = true;
+    s.src = u + "?" + ((Date.now() / 60000) | 0);
+    var h = d.getElementsByTagName("script")[0];
+    h.parentNode.insertBefore(s, h);
+  })(
+    window,
+    document,
+    "https://cdn-ru.bitrix24.by/b30573366/crm/site_button/loader_4_myjcfv.js"
+  );
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
@@ -130,22 +127,35 @@ export default function Home({ refreshToken }) {
     lots.map((item) => (result += item.price));
     return result;
   };
+  function getDaySuffix(number) {
+    const absNum = Math.abs(number);
+    const lastDigit = absNum % 10;
+    const lastTwoDigits = absNum % 100;
+
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+      return "дней";
+    }
+
+    if (lastDigit === 1) return "день";
+    if (lastDigit >= 2 && lastDigit <= 4) return "дня";
+    return "дней";
+  }
 
   const getRemDays = (targetDate) => {
     const today = new Date();
     const target = new Date(targetDate);
     const diffTime = target - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    let result = "";
-    if (diffDays === 1) {
-      result = "1 день";
+    let result;
+
+    if (diffDays === 0) {
+      result = "Сегодня последний день";
     } else if (diffDays < 0) {
-      result = "просрочено на " + diffDays + " дней";
-    } else if (diffDays < 5) {
-      result = diffDays + " дня";
+      result = `просрочено на ${Math.abs(diffDays)} ${getDaySuffix(diffDays)}`;
     } else {
-      result = diffDays + " дней";
+      result = `${diffDays} ${getDaySuffix(diffDays)}`;
     }
+
     return result;
   };
 
@@ -467,150 +477,154 @@ export default function Home({ refreshToken }) {
           </p>
         ) : tenders.length !== 0 ? (
           <div className=" ">
-          <div className=" flex flex-col gap-[30px] 	sm:p-[20px] ">
-            {tenders.map((item, index) => (
-              <div
-                className="bg-[#F6FCF2] p-[30px] rounded-lg relative flex flex-col gap-[30px] card "
-                key={index}
-              >
-                <div className=" absolute  top-[-10px] right-[-10px] flex gap-[10px] ">
-                  <div
-                    className={`${
-                      item.status === "open"
-                        ? "bg-[#F7FFD7] text-[#817925] border-[#dbd415]"
-                        : item.status === "work"
-                        ? "bg-[#ECECEC] text-[#545454] border-[#707070]"
-                        : item.status === "completed"
-                        ? "bg-[#E4FFD7] text-[#3D6821] border-[#5FB059]"
-                        : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
-                    } border-2 rounded-2xl w-fit p-[0_15px] tag `}
-                  >
-                    {item.status === "open"
-                      ? "Подача документов"
-                      : item.status === "work"
-                      ? "Работа комиссии"
-                      : item.status === "completed"
-                      ? "Завершен"
-                      : "Отменен"}
-                  </div>
-                  <div
-                    className={`${
-                      item.user_status === "not_reviewed"
-                        ? "bg-[#F7FFD7] text-[#817925] border-[#dbd415]"
-                        : item.user_status === "taken_into_work"
-                        ? "bg-[#ECECEC] text-[#545454] border-[#707070]"
-                        : item.user_status === "suitable"
-                        ? "bg-[#E4FFD7] text-[#3D6821] border-[#5FB059]"
-                        : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
-                    } border-2 rounded-2xl w-fit p-[0_15px]  tag`}
-                  >
-                    {item.user_status === "not_reviewed"
-                      ? "Не рассмотрен"
-                      : item.user_status === "suitable"
-                      ? "Подходящий"
-                      : item.user_status === "Подходящий"
-                      ? "Не подходящий"
-                      : "Взят в работу"}
-                  </div>
-                </div>
-                <div className="flex flex-col ">
-                  <p className="text-3xl font-medium  mb-[30px]">{item.name}</p>
-                  <div className="flex justify-between w-full items-center flex-wrap gap-[10px_20px] card-basic">
-                    <Link
-                      to={item.link}
-                      className=" text-gradient flex gap-[5px] text-[#646D5C] whitespace-nowrap  overflow-hidden text-ellipsis"
-                    >
-                      <img src={linkSvg} alt="" className="w-[15px] " />
-                      {item.link}
-                    </Link>
+            <div className=" flex flex-col gap-[30px] 	sm:p-[20px] ">
+              {tenders.map((item, index) => (
+                <div
+                  className="bg-[#F6FCF2] p-[30px] rounded-lg relative flex flex-col gap-[30px] card "
+                  key={index}
+                >
+                  <div className=" absolute  top-[-10px] right-[-10px] flex gap-[10px] ">
                     <div
-                      onClick={() => copyToClipboard(item.tender_number)}
-                      className="flex gap-[5px] cursor-pointer group"
+                      className={`${
+                        item.status === "open"
+                          ? "bg-[#F7FFD7] text-[#817925] border-[#dbd415]"
+                          : item.status === "work"
+                          ? "bg-[#ECECEC] text-[#545454] border-[#707070]"
+                          : item.status === "completed"
+                          ? "bg-[#E4FFD7] text-[#3D6821] border-[#5FB059]"
+                          : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
+                      } border-2 rounded-2xl w-fit p-[0_15px] tag `}
                     >
-                      <img src={copySvg} alt="" className="w-[15px]" />
-                      <p className="group-hover:text-[#646D5C]">
-                        {item.tender_number}
-                      </p>
+                      {item.status === "open"
+                        ? "Подача документов"
+                        : item.status === "work"
+                        ? "Работа комиссии"
+                        : item.status === "completed"
+                        ? "Завершен"
+                        : "Отменен"}
                     </div>
-                    <div className="flex flex-col">
-                      <p className="text-m text-black/60 ">Сумма:</p>
-                      <p className=" text-xl font-extrabold">
-                        {getFinalAmount(item.lots)} {item.lots[0].currency}
-                      </p>
-                    </div>
-
-                    <div className="flex gap-[5px] items-center">
-                      <img src={watchSvg} className="w-[18px]" alt="" />
-
-                      <p className="text-xl text-[#646D5C]">
-                        {getRemDays(item.end_date)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className=" grid grid-cols-[2fr_3fr] gap-[30px] items-end tender-main">
-                  <div className="grid grid-cols-[auto_3fr] gap-[0px_25px] items-center tender-left">
-                    <p className="text-m text-black/60 col-span-full">
-                      {" "}
-                      Заказчик:
-                    </p>
-                    <p className="card_info-item col-span-full mb-[15px]">
-                      {item.customer_name}
-                    </p>
-                    <p className="text-m text-black/60 col-span-full">
-                      Платформа:
-                    </p>
-                    <p className="card_info-item col-span-full  mb-[15px]">
-                      {item.platform.name}
-                    </p>
-                    <p className="text-m text-black/60 col-span-full">
-                      Даты подачи:
-                    </p>
-                    <p className="card_info-item col-span-full  mb-[15px]">
-                      {formatDateOnly(item.start_date)} -{" "}
-                      {formatDateOnly(item.end_date)}
-                    </p>
-
-                    <div className="col-span-full flex flex-wrap gap-[15px] pt-[15px] btn-wrapper ">
-                      <button
-                        onClick={() => markAsSuitable(item.user_tender_id)}
-                        className={`${
-                          item.user_status === "suitable"
-                            ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
-                            : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
-                        } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full  sm:w-[calc(50%-7.5px)] min-w-[200px] `}
-                      >
-                        <LikeIcon className="item-button-svg" />
-                        Подходящий
-                      </button>
-
-                      <button
-                        onClick={() => setUnsuitableID(item.user_tender_id)}
-                        className={`${
-                          item.user_status === "unsuitable"
-                            ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
-                            : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
-                        } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full sm:w-[calc(50%-7.5px)] min-w-[200px]`}
-                      >
-                        <Dislike className="item-button-svg" />
-                        Не подходящий
-                      </button>
-
-                      <button
-                        onClick={() => MarkAsTakenIntoWork(item.user_tender_id)}
-                        className={`${
-                          item.user_status === "taken_into_work"
-                            ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
-                            : "bg-[#646d5c]/10 hover:bg-[#646d5c]/20 text-[#646d5c] border-[#646d5c]"
-                        } button-suitable col-span-full flex w-full items-center justify-center gap-[5px] rounded-xl border-2 p-[10px_25px] text-[20px] whitespace-nowrap`}
-                      >
-                        <WorkImg className="item-button-svg" />В работу
-                      </button>
+                    <div
+                      className={`${
+                        item.user_status === "not_reviewed"
+                          ? "bg-[#F7FFD7] text-[#817925] border-[#dbd415]"
+                          : item.user_status === "taken_into_work"
+                          ? "bg-[#ECECEC] text-[#545454] border-[#707070]"
+                          : item.user_status === "suitable"
+                          ? "bg-[#E4FFD7] text-[#3D6821] border-[#5FB059]"
+                          : "bg-[#FFD7D7] text-[#682121] border-[#B05959]"
+                      } border-2 rounded-2xl w-fit p-[0_15px]  tag`}
+                    >
+                      {item.user_status === "not_reviewed"
+                        ? "Не рассмотрен"
+                        : item.user_status === "suitable"
+                        ? "Подходящий"
+                        : item.user_status === "Подходящий"
+                        ? "Не подходящий"
+                        : "Взят в работу"}
                     </div>
                   </div>
-                  <LotsWrap lots={item.lots} index={index} />
-                  {/* <div className="lots-wrap bg-white p-[20px] rounded-2xl  overflow-hidden relative">
+                  <div className="flex flex-col ">
+                    <p className="text-3xl font-medium  mb-[30px]">
+                      {item.name}
+                    </p>
+                    <div className="flex justify-between w-full items-center flex-wrap gap-[10px_30px] card-basic">
+                      <Link
+                        to={item.link}
+                        className="  flex gap-[5px] text-[#646D5C] whitespace-nowrap  overflow-hidden text-ellipsis"
+                      >
+                        <img src={linkSvg} alt="" className="w-[15px] " />
+                        ссылка на тендер
+                      </Link>
+                      <div
+                        onClick={() => copyToClipboard(item.tender_number)}
+                        className="flex gap-[5px] cursor-pointer group"
+                      >
+                        <img src={copySvg} alt="" className="w-[15px]" />
+                        <p className="group-hover:text-[#646D5C]">
+                          {item.tender_number}
+                        </p>
+                      </div>
+                      <div className="flex flex-col">
+                        <p className="text-m text-black/60 ">Сумма:</p>
+                        <p className=" text-xl font-extrabold">
+                          {getFinalAmount(item.lots)} {item.lots[0].currency}
+                        </p>
+                      </div>
+
+                      <div className="flex gap-[5px] items-center">
+                        <img src={watchSvg} className="w-[18px]" alt="" />
+
+                        <p className="text-xl text-[#646D5C]">
+                          {getRemDays(item.end_date_2)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className=" grid grid-cols-[2fr_3fr] gap-[30px] items-end tender-main">
+                    <div className="grid grid-cols-[auto_3fr] gap-[0px_25px] items-center tender-left">
+                      <p className="text-m text-black/60 col-span-full">
+                        {" "}
+                        Заказчик:
+                      </p>
+                      <p className="card_info-item col-span-full mb-[15px]">
+                        {item.customer_name}
+                      </p>
+                      <p className="text-m text-black/60 col-span-full">
+                        Платформа:
+                      </p>
+                      <p className="card_info-item col-span-full  mb-[15px]">
+                        {item.platform.name}
+                      </p>
+                      <p className="text-m text-black/60 col-span-full">
+                        Даты подачи:
+                      </p>
+                      <p className="card_info-item col-span-full  mb-[15px]">
+                        {formatDateOnly(item.start_date)} -{" "}
+                        {formatDateOnly(item.end_date)}
+                      </p>
+
+                      <div className="col-span-full flex flex-wrap gap-[15px] pt-[15px] btn-wrapper ">
+                        <button
+                          onClick={() => markAsSuitable(item.user_tender_id)}
+                          className={`${
+                            item.user_status === "suitable"
+                              ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                              : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
+                          } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full  sm:w-[calc(50%-7.5px)] min-w-[200px] `}
+                        >
+                          <LikeIcon className="item-button-svg" />
+                          Подходящий
+                        </button>
+
+                        <button
+                          onClick={() => setUnsuitableID(item.user_tender_id)}
+                          className={`${
+                            item.user_status === "unsuitable"
+                              ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                              : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
+                          } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full sm:w-[calc(50%-7.5px)] min-w-[200px]`}
+                        >
+                          <Dislike className="item-button-svg" />
+                          Не подходящий
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            MarkAsTakenIntoWork(item.user_tender_id)
+                          }
+                          className={`${
+                            item.user_status === "taken_into_work"
+                              ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                              : "bg-[#646d5c]/10 hover:bg-[#646d5c]/20 text-[#646d5c] border-[#646d5c]"
+                          } button-suitable col-span-full flex w-full items-center justify-center gap-[5px] rounded-xl border-2 p-[10px_25px] text-[20px] whitespace-nowrap`}
+                        >
+                          <WorkImg className="item-button-svg" />В работу
+                        </button>
+                      </div>
+                    </div>
+                    <LotsWrap lots={item.lots} index={index} />
+                    {/* <div className="lots-wrap bg-white p-[20px] rounded-2xl  overflow-hidden relative">
                   <div className="absolute bottom-0 bg-fade-white h-[70px] w-full"></div>
                   <p className="text-2xl mb-[20px]">Лоты: {item.lots.length}</p>
                   <div className="flex gap-[10px] flex-wrap ">
@@ -624,42 +638,44 @@ export default function Home({ refreshToken }) {
                     ))}
                   </div>
                 </div> */}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-              <div className="flex justify-center items-center gap-3 py-4">
-        <button
-          onClick={onPrev}
-          disabled={page === 1}
-          className="px-3 py-1 border-2 border-[#646D5C] rounded-lg disabled:opacity-50  hover:bg-[#F0F6EB]"
-        >
-          ←
-        </button>
+            <div className="flex justify-center items-center gap-3 py-4">
+              <button
+                onClick={onPrev}
+                disabled={page === 1}
+                className="px-3 py-1 border-2 border-[#646D5C] rounded-lg disabled:opacity-50  hover:bg-[#F0F6EB]"
+              >
+                ←
+              </button>
 
-        {Array.from({ length: totalPages }, (_, idx) => idx + 1)
-          .slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))
-          .map((p) => (
-            <button
-              key={p}
-              onClick={() => onSelectPage(p)}
-              className={`px-3 py-1 border-2 border-[#646D5C] rounded-lg ${
-                p === page ? "bg-[#646D5C] text-white" : " hover:bg-[#F0F6EB]"
-              }`}
-            >
-              {p}
-            </button>
-          ))}
+              {Array.from({ length: totalPages }, (_, idx) => idx + 1)
+                .slice(Math.max(0, page - 3), Math.min(totalPages, page + 2))
+                .map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => onSelectPage(p)}
+                    className={`px-3 py-1 border-2 border-[#646D5C] rounded-lg ${
+                      p === page
+                        ? "bg-[#646D5C] text-white"
+                        : " hover:bg-[#F0F6EB]"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
 
-        <button
-          onClick={onNext}
-          disabled={page === totalPages}
-          className="px-3 py-1 border-[#646D5C] border-2 rounded-lg disabled:opacity-50  hover:bg-[#F0F6EB]"
-        >
-           →
-        </button>
-      </div>
+              <button
+                onClick={onNext}
+                disabled={page === totalPages}
+                className="px-3 py-1 border-[#646D5C] border-2 rounded-lg disabled:opacity-50  hover:bg-[#F0F6EB]"
+              >
+                →
+              </button>
+            </div>
           </div>
         ) : (
           <div className="m-auto">
@@ -667,8 +683,6 @@ export default function Home({ refreshToken }) {
           </div>
         )}
       </div>
-
-  
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { notify } from "../../utils/notify";
 import Marquee from "react-fast-marquee";
+import { useLogout } from "../../hooks/useLogout";
 
 export default function Register() {
   const [error, setError] = useState("");
@@ -20,6 +21,8 @@ export default function Register() {
     phone_number: "",
     unp: "",
   });
+
+  const logout = useLogout()
 
   const handleSubmit = async (e) => {
     setLoading(true);
@@ -39,12 +42,14 @@ export default function Register() {
       );
       const data = await response.json();
       if (response.ok) {
+
         setCookie("auth_token", data.access_token, { path: "/", maxAge: 3600 });
              setCookie("refresh_token", data.refresh_token, {
           path: "/regius_tenders",
           maxAge: 86400,
         });
-        navigate("/");
+
+        logout()
       } else {
         // setError("Ошибка регистрации: " + data.detail);
 
@@ -171,6 +176,7 @@ export default function Register() {
           <input
             type="submit"
             className="button auth_submit w-fit m-auto pl-[40px] pr-[40px] pt-[20px] pb-[20px] bg-[#93A188] border-2  border-transparent cursor-pointer rounded-md text-white uppercase text-xl hover:bg-transparent hover:border-2 hover:border-[#93A188] hover:text-[#93A188] big-button"
+            value={'Зарегистрироваться'}
           />
 
           <Link

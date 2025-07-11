@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Sidebar.scss";
 import icon1 from "../../assets/images/sidebarIcon1.svg";
 import { Link, useLocation } from "react-router-dom";
@@ -9,7 +9,7 @@ export default function Sidebar({
   isSideBarHidden,
   setIsSideBarHidden,
   screenWidth,
-  refreshToken
+  refreshToken,
 }) {
   const tabs = [
     {
@@ -92,22 +92,50 @@ export default function Sidebar({
       link: "/settings",
     },
   ];
+  const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
   const path = location.pathname;
+  const loaderRef = useRef(null);
 
   useEffect(() => {
     if (screenWidth < 1024) setIsSideBarHidden(true);
   }, [path]);
 
-  const { userInfo, error, setError } = useUserInfo(refreshToken);
+  const { userInfo, error, setError, loader } = useUserInfo(refreshToken);
   if (error) setError(error);
-  // console.log(userInfo);
+  useEffect(() => {
+    setIsLoading(loader ? true : false);
+  }, [loader]);
+  useEffect(() => {
+    if (!isLoading || !loaderRef.current) return;
+
+    const observer = new MutationObserver(() => {
+      const hasLoader = loaderRef.current.querySelector(".isNotActiveUser");
+      if (!hasLoader) {
+     
+        window.location.reload();
+      }
+    });
+
+    observer.observe(loaderRef.current, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => observer.disconnect();
+  }, [isLoading]);
+
   return (
+    <div className="">
+    <div ref={loaderRef}>
+        {isLoading && <Loader isFull={true} isNotActiveUser={true} />}
+      </div>
     <div
       className={`${
         isSideBarHidden ? "w-0 min-w-0 " : "w-[250px] min-w-[250px]  p-[20px] "
       } h-screen bg-[#646D5C] flex flex-col justify-between sidebar transition-all duration-500 ease-in-out overflow-hidden`}
     >
+      
       <div className="">
         <p className="text-3xl text-white mb-[40px]">{pageName}</p>
 
@@ -136,6 +164,7 @@ export default function Sidebar({
       ) : (
         <Loader isFull={false} />
       )}
+    </div>
     </div>
   );
 }

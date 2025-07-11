@@ -5,7 +5,7 @@
 
 * {
   transition: 0.5s;
-  font-family: "TT Norms", sans-serif;
+  font-family: "TT Norms", sans-serif !important;
 }
 @font-face {
   font-family: "TT Norms";
