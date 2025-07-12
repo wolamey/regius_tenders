@@ -125,13 +125,7 @@ a {
 }
 
 @media (max-width: 1600px) {
-  .btn-wrapper {
-    display: flex;
-    flex-direction: column;
-  }
-  .btn-wrapper button {
-    width: 100%;
-  }
+
 }
 @media (max-width: 1300px) {
   .tender-main {
@@ -160,8 +154,19 @@ a {
     display: flex;
   }
 }
+@media (max-width: 900px) {
+
+    .btn-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+  .btn-wrapper button {
+    width: 100%;
+  }
+}
 
 @media (max-width: 550px) {
+
   .text-3xl {
     font-size: 26px;
   }

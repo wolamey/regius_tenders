@@ -32,7 +32,6 @@ export default function Home({ refreshToken }) {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [isFiltersHidden, setIsFiltersHidden] = useState(false);
 
-
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
     // console.log(screenWidth);
@@ -89,6 +88,7 @@ export default function Home({ refreshToken }) {
   // reload on filters or page change
   useEffect(() => {
     getTenders();
+    console.log(filters.status === "");
   }, [filters, page]);
 
   const onPrev = () => setPage((p) => Math.max(1, p - 1));
@@ -270,10 +270,13 @@ export default function Home({ refreshToken }) {
     getPlatformStatuses();
   }, []);
 
-  const earaseFilters = () => {
-    setFilters({
-      status: "",
-      platform: "",
+  const earaseFilters = (filter) => {
+    setFilters((prev) => {
+      const updated = {
+        ...prev,
+        [filter]: "",
+      };
+      return updated;
     });
   };
 
@@ -297,8 +300,22 @@ export default function Home({ refreshToken }) {
           } `}
         >
           <div className="grid grid-cols-[1fr_1fr]  gap-[20px] filters">
-            <div className="flex flex-col gap-[5px]">
-              <p>Пользовательский статус</p>
+            <div className="flex flex-col gap-[20px]">
+              <div className="flex gap-[5px_20px] items-center flex-wrap">
+                <p className="whitespace-nowrap">Пользовательский статус</p>
+
+                <button
+                  className={`p-[10px] text-[14px] rounded-lg leading-1   border-2 border-[#B05959]
+bg-[#FFC7C7]/50 hover:bg-[#ffacac]/50 ${
+                    filters.status === ""
+                      ? "opacity-0 pointer-events-none"
+                      : " opacity-100"
+                  }`}
+                  onClick={() => earaseFilters("status")}
+                >
+                  очистить
+                </button>
+              </div>
 
               <ul className="flex gap-[10px] flex-wrap">
                 {userStatustes ? (
@@ -330,8 +347,22 @@ export default function Home({ refreshToken }) {
                 )}
               </ul>
             </div>
-            <div className="flex flex-col gap-[5px] ">
-              <p>Статус платформы</p>
+            <div className="flex flex-col gap-[20px] ">
+                <div className="flex gap-[5px_20px] items-center flex-wrap">
+                <p className="whitespace-nowrap">Статус платформы</p>
+
+                <button
+                  className={`p-[10px] text-[14px] rounded-lg leading-1   border-2 border-[#B05959]
+bg-[#FFC7C7]/50 hover:bg-[#ffacac]/50 ${
+                    filters.platform === ""
+                      ? "opacity-0 pointer-events-none"
+                      : " opacity-100"
+                  }`}
+                  onClick={() => earaseFilters("platform")}
+                >
+                  очистить
+                </button>
+              </div>
 
               <ul className="flex gap-[10px] flex-wrap">
                 {platformStatustes ? (
@@ -365,7 +396,7 @@ export default function Home({ refreshToken }) {
             </div>
           </div>
 
-          <button
+          {/* <button
             onClick={earaseFilters}
             className={`${
               filters.platform === "" && filters.status === ""
@@ -374,7 +405,7 @@ export default function Home({ refreshToken }) {
             }  p-[10px_20px] underline border-2 border-[#B05959] rounded-xl bg-[#ffacac]/20 hover:bg-[#ffacac]/50`}
           >
             Очистить все фильтры
-          </button>
+          </button> */}
         </div>
         <div
           className="showFilters rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap w-[-webkit-fill-available] text-center bg-white flex gap-[5px] justify-center items-center hidden m-[0_20px_20px_20px]"
@@ -550,8 +581,8 @@ export default function Home({ refreshToken }) {
                     </div>
                   </div>
 
-                  <div className=" grid grid-cols-[2fr_3fr] gap-[30px] items-end tender-main">
-                    <div className="grid grid-cols-[auto_3fr] gap-[0px_25px] items-center tender-left">
+                  <div className=" grid grid-cols-[1fr_1fr] gap-[30px] items-end tender-main">
+                    <div className="">
                       <p className="text-m text-black/60 col-span-full">
                         {" "}
                         Заказчик:
@@ -572,45 +603,6 @@ export default function Home({ refreshToken }) {
                         {formatDateOnly(item.start_date)} -{" "}
                         {formatDateOnly(item.end_date)}
                       </p>
-
-                      <div className="col-span-full flex flex-wrap gap-[15px] pt-[15px] btn-wrapper ">
-                        <button
-                          onClick={() => markAsSuitable(item.user_tender_id)}
-                          className={`${
-                            item.user_status === "suitable"
-                              ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
-                              : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
-                          } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full  sm:w-[calc(50%-7.5px)] min-w-[200px] `}
-                        >
-                          <LikeIcon className="item-button-svg" />
-                          Подходящий
-                        </button>
-
-                        <button
-                          onClick={() => setUnsuitableID(item.user_tender_id)}
-                          className={`${
-                            item.user_status === "unsuitable"
-                              ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
-                              : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
-                          } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full sm:w-[calc(50%-7.5px)] min-w-[200px]`}
-                        >
-                          <Dislike className="item-button-svg" />
-                          Не подходящий
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            MarkAsTakenIntoWork(item.user_tender_id)
-                          }
-                          className={`${
-                            item.user_status === "taken_into_work"
-                              ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
-                              : "bg-[#646d5c]/10 hover:bg-[#646d5c]/20 text-[#646d5c] border-[#646d5c]"
-                          } button-suitable col-span-full flex w-full items-center justify-center gap-[5px] rounded-xl border-2 p-[10px_25px] text-[20px] whitespace-nowrap`}
-                        >
-                          <WorkImg className="item-button-svg" />В работу
-                        </button>
-                      </div>
                     </div>
                     <LotsWrap lots={item.lots} index={index} />
                     {/* <div className="lots-wrap bg-white p-[20px] rounded-2xl  overflow-hidden relative">
@@ -627,6 +619,44 @@ export default function Home({ refreshToken }) {
                     ))}
                   </div>
                 </div> */}
+                  </div>
+
+                  {/* <div className=" grid     grid-cols-[repeat(auto-fit,_minmax(210px,_1fr))] gap-[15px] pt-[15px] btn-wrapper "> */}
+                  <div className=" flex      gap-[15px] pt-[15px] btn-wrapper ">
+                    <button
+                      onClick={() => markAsSuitable(item.user_tender_id)}
+                      className={`${
+                        item.user_status === "suitable"
+                          ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                          : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
+                      } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full  sm:w-[calc(50%-7.5px)] min-w-[200px] `}
+                    >
+                      <LikeIcon className="item-button-svg" />
+                      Подходящий
+                    </button>
+
+                    <button
+                      onClick={() => setUnsuitableID(item.user_tender_id)}
+                      className={`${
+                        item.user_status === "unsuitable"
+                          ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                          : "bg-[#646d5c]/25 hover:bg-[#646d5c]/40 text-[#646d5c]"
+                      } button-suitable flex items-center justify-center gap-[5px] rounded-xl p-[10px_25px] text-[20px] whitespace-nowrap w-full sm:w-[calc(50%-7.5px)] min-w-[200px]`}
+                    >
+                      <Dislike className="item-button-svg" />
+                      Не подходящий
+                    </button>
+
+                    <button
+                      onClick={() => MarkAsTakenIntoWork(item.user_tender_id)}
+                      className={`${
+                        item.user_status === "taken_into_work"
+                          ? "bg-[#646d5c]/75 text-[#F6FCF2] active pointer-events-none"
+                          : "bg-[#646d5c]/10 hover:bg-[#646d5c]/20 text-[#646d5c] border-[#646d5c]"
+                      } button-suitable  flex w-full items-center justify-center gap-[5px] rounded-xl border-2 p-[10px_25px] text-[20px] whitespace-nowrap`}
+                    >
+                      <WorkImg className="item-button-svg" />В работу
+                    </button>
                   </div>
                 </div>
               ))}
