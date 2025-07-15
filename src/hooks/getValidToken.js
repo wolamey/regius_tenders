@@ -23,7 +23,7 @@ export function useValidToken() {
 
       const data = await response.json();
 
-      console.log(data)
+      // console.log(data)
       setCookie("auth_token", data.access_token, {
         path: "/regius_tenders",
         maxAge: 3600,
@@ -36,7 +36,7 @@ export function useValidToken() {
 
       return data.access_token;
     } catch (err) {
-      console.error("Ошибка обновления токена:", err);
+      // console.error("Ошибка обновления токена:", err);
       return null;
     }
   };

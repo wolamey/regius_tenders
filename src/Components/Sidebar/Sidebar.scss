@@ -1,25 +1,60 @@
+
+
 .tab_item.active {
-  color: #ddedd1;
+  color: var(--bg);
 
   p {
-    color: #ddedd1;
+    color: var(--bg);
   }
   svg {
-    color: #ddedd1;
+    color: var(--bg);
+
   }
 }
 svg {
   color: #fff;
 }
 
-.tab_item:hover{
-
- svg {
-  color: #ddedd1 !important;
+.tab_item:hover {
+  svg {
+    color: var(--bg) !important;
+  }
 }
 
-}
-
-.sidebar_item svg{
+.sidebar_item svg {
   min-width: 23px;
+}
+
+.dark {
+  .tab_item.active {
+    color: var(--bg);
+
+    p {
+      color: #fff;
+    }
+    svg {
+      color: #fff;
+    }
+
+    &:hover{
+      opacity: 1;
+    p {
+      color: #fff !important;
+    }
+    svg {
+      color: #fff !important;
+    }      
+    }
+  }
+
+  .tab_item:hover{
+    opacity: 0.7;
+    p {
+      color: #fff !important;
+    }
+    svg {
+      color: #fff !important;
+    }      
+    }
+  
 }

@@ -69,14 +69,14 @@ const markAsUnsuitable = async () => {
   }, [infoPopupText, watchInfoPopup]);
 
   return (
-    <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-99 h-screen flex ">
+    <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--bg-modal)]/50 z-99 h-screen flex ">
       {error !== "" && <ErrorPopup errText={error} setError={setError} />}
 
       {infoPopupText !== "" && (
         <InfoPopup text={infoPopupText} setInfo={setInfoPopupText} />
       )}
 
-      <div className="bg-white max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[10px]">
+      <div className="bg-[var(--bg)] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[10px]">
         <p className="text-2xl">
           Пожалуйста, введите причину почему данный тендер не подходит
         </p>
@@ -93,13 +93,13 @@ const markAsUnsuitable = async () => {
         <div className="grid grid-cols-2 gap-[10px] w-full">
           <button
             onClick={() => setUnsuitableID("")}
-            className="p-[10px_25px] w-full bg-[#646d5c]/25 rounded-xl text-[#646d5c] justify-center text-[20px]   hover:bg-[#646d5c]/40 whitespace-nowrap"
+            className="p-[10px_25px] w-full bg-[var(--main)]/25 rounded-xl text-[var(--main)] justify-center text-[20px]   hover:bg-[var(--main)]/40 whitespace-nowrap"
           >
             Отмена
           </button>
           <button
             onClick={markAsUnsuitable}
-            className="p-[10px_25px] w-full bg-[#646d5c]/90 rounded-xl text-[#ffffff] justify-center text-[20px]   hover:bg-[#646d5c] whitespace-nowrap"
+            className="p-[10px_25px] w-full bg-[var(--main)]/90 rounded-xl text-[#ffffff] justify-center text-[20px]   hover:bg-[var(--main)] whitespace-nowrap"
           >
             Отправить
           </button>

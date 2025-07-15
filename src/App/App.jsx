@@ -10,11 +10,10 @@ import Home from "../Pages/Home/Home";
 import Settings from "../Pages/Settings/Settings";
 import RequireAuth from "../Components/RequireAuth/RequireAuth";
 
-
 // Компонент для подгрузки Bitrix24-чата
 const BitrixScript = () => {
   useEffect(() => {
-    const selector = 
+    const selector =
       'script[src^="https://cdn-ru.bitrix24.by/b30573366/crm/site_button/loader_4_myjcfv.js"]';
 
     // Если скрипта ещё нет — добавляем
@@ -67,7 +66,7 @@ const App = () => {
         path: "/regius_tenders",
         maxAge: 86400,
       });
-
+      alert("refreshed");
       return data.access_token;
     } catch (err) {
       console.error("Ошибка при обновлении токена:", err);
@@ -76,41 +75,41 @@ const App = () => {
   };
 
   return (
-        <div className="app">
-          <ReactNotifications />
+    <div className="app">
+      <ReactNotifications />
 
-          <Routes>
-            {/* Публичные страницы */}
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/register" element={<Register />} />
+      <Routes>
+        {/* Публичные страницы */}
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/register" element={<Register />} />
 
-            {/* Защищённые маршруты — только для авторизованных */}
-            <Route element={<RequireAuth />}>
-              <Route
-                path="/"
-                element={
-                  <>
-                    <BitrixScript />
-                    <Layout refreshToken={refreshToken} pageName="Тендеры">
-                      <Home refreshToken={refreshToken} />
-                    </Layout>
-                  </>
-                }
-              />
-              <Route
-                path="/settings"
-                element={
-                  <>
-                    <BitrixScript />
-                    <Layout refreshToken={refreshToken} pageName="Настройки">
-                      <Settings refreshToken={refreshToken} />
-                    </Layout>
-                  </>
-                }
-              />
-            </Route>
-          </Routes>
-        </div>
+        {/* Защищённые маршруты — только для авторизованных */}
+        <Route element={<RequireAuth />}>
+          <Route
+            path="/"
+            element={
+              <>
+                <BitrixScript />
+                <Layout refreshToken={refreshToken} pageName="Тендеры">
+                  <Home refreshToken={refreshToken} />
+                </Layout>
+              </>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <>
+                <BitrixScript />
+                <Layout refreshToken={refreshToken} pageName="Настройки">
+                  <Settings refreshToken={refreshToken} />
+                </Layout>
+              </>
+            }
+          />
+        </Route>
+      </Routes>
+    </div>
   );
 };
 

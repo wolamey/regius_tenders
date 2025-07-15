@@ -9,12 +9,11 @@ import ErrorPopup from "../../Components/ErrorPopup/ErrorPopup";
 import { notify } from "../../utils/notify";
 import { tryProtectedRequest } from "../../utils/tryProtectedRequest";
 
-export default function Settings({refreshToken}) {
-  const { userInfo, error, setError, refreshUserInfo } = useUserInfo(refreshToken);
+export default function Settings({ refreshToken }) {
+  const { userInfo, error, setError, refreshUserInfo } =
+    useUserInfo(refreshToken);
   if (error) setError(error);
   const logout = useLogout();
-
-
 
   const [filters, setFilters] = useState({});
   const [cookies, setCookie, removeCookie] = useCookies(["auth_token"]);
@@ -67,55 +66,53 @@ export default function Settings({refreshToken}) {
     }
   }, [userInfo]);
 
+  const updateUserInfo = async () => {
+    setLoader(true);
 
-const updateUserInfo = async () => {
-  setLoader(true);
+    try {
+      const sendData = {
+        email: userAccountData.email,
+        password: userAccountData.password,
+        phone_number: userAccountData.phone_number,
+        filter: filters,
+      };
 
-  try {
-    const sendData = {
-      email: userAccountData.email,
-      password: userAccountData.password,
-      phone_number: userAccountData.phone_number,
-      filter: filters,
-    };
+      const { data, response } = await tryProtectedRequest({
+        url: "https://tendersiteapi.dev.regiuslab.by/v1/user/me",
+        method: "PATCH",
+        body: sendData,
+        token: cookies.auth_token,
+        refreshToken,
+        logout,
+      });
 
-    const { data, response } = await tryProtectedRequest({
-      url: "https://tendersiteapi.dev.regiuslab.by/v1/user/me",
-      method: "PATCH",
-      body: sendData,
-      token: cookies.auth_token,
-      refreshToken,
-      logout,
-    });
+      if (!response.ok) {
+        notify({
+          title: "Ошибка",
+          message: "Ошибка обновления данных",
+          type: "danger",
+        });
+        return;
+      }
 
-    if (!response.ok) {
+      notify({
+        title: "Успешно",
+        message: "Данные обновлены",
+        type: "success",
+      });
+
+      setAddInfo(false);
+      refreshUserInfo();
+    } catch (err) {
       notify({
         title: "Ошибка",
-        message: "Ошибка обновления данных",
+        message: "Произошла сетевая ошибка",
         type: "danger",
       });
-      return;
+    } finally {
+      setLoader(false);
     }
-
-    notify({
-      title: "Успешно",
-      message: "Данные обновлены",
-      type: "success",
-    });
-
-    setAddInfo(false);
-    refreshUserInfo();
-  } catch (err) {
-    notify({
-      title: "Ошибка",
-      message: "Произошла сетевая ошибка",
-      type: "danger",
-    });
-  } finally {
-    setLoader(false);
-  }
-};
-
+  };
 
   const [showEmailPopup, setShowEmailPopup] = useState(false);
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
@@ -124,88 +121,86 @@ const updateUserInfo = async () => {
 
   // Update email
 
-const updateEmail = async () => {
-  setLoader(true);
-  try {
-    const { data, response } = await tryProtectedRequest({
-      url: "https://tendersiteapi.dev.regiuslab.by/v1/user/me",
-      method: "PATCH",
-      body: { email: newEmail },
-      token: cookies.auth_token,
-      refreshToken,
-      logout,
-    });
+  const updateEmail = async () => {
+    setLoader(true);
+    try {
+      const { data, response } = await tryProtectedRequest({
+        url: "https://tendersiteapi.dev.regiuslab.by/v1/user/me",
+        method: "PATCH",
+        body: { email: newEmail },
+        token: cookies.auth_token,
+        refreshToken,
+        logout,
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
+        notify({
+          title: "Ошибка",
+          message: data.message || "Ошибка обновления email",
+          type: "danger",
+        });
+        return;
+      }
+
+      notify({
+        title: "Успешно",
+        message: "Email успешно обновлен",
+        type: "success",
+      });
+
+      refreshUserInfo();
+      setShowEmailPopup(false);
+    } catch (err) {
       notify({
         title: "Ошибка",
-        message: data.message || "Ошибка обновления email",
+        message: "Произошла сетевая ошибка",
         type: "danger",
       });
-      return;
+    } finally {
+      setLoader(false);
     }
-
-    notify({
-      title: "Успешно",
-      message: "Email успешно обновлен",
-      type: "success",
-    });
-
-    refreshUserInfo();
-    setShowEmailPopup(false);
-  } catch (err) {
-    notify({
-      title: "Ошибка",
-      message: "Произошла сетевая ошибка",
-      type: "danger",
-    });
-  } finally {
-    setLoader(false);
-  }
-};
-
+  };
 
   // Update password
 
-const updatePassword = async () => {
-  setLoader(true);
-  try {
-    const { data, response } = await tryProtectedRequest({
-      url: "https://tendersiteapi.dev.regiuslab.by/v1/user/me",
-      method: "PATCH",
-      body: { password: newPassword },
-      token: cookies.auth_token,
-      refreshToken,
-      logout,
-    });
+  const updatePassword = async () => {
+    setLoader(true);
+    try {
+      const { data, response } = await tryProtectedRequest({
+        url: "https://tendersiteapi.dev.regiuslab.by/v1/user/me",
+        method: "PATCH",
+        body: { password: newPassword },
+        token: cookies.auth_token,
+        refreshToken,
+        logout,
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
+        notify({
+          title: "Ошибка",
+          message: data.message || "Ошибка обновления пароля",
+          type: "danger",
+        });
+        return;
+      }
+
+      notify({
+        title: "Успешно",
+        message: "Пароль успешно обновлен",
+        type: "success",
+      });
+
+      setShowPasswordPopup(false);
+    } catch (err) {
       notify({
         title: "Ошибка",
-        message: data.message || "Ошибка обновления пароля",
+        message: "Произошла сетевая ошибка",
         type: "danger",
       });
-      return;
+    } finally {
+      setLoader(false);
     }
-
-    notify({
-      title: "Успешно",
-      message: "Пароль успешно обновлен",
-      type: "success",
-    });
-
-    setShowPasswordPopup(false);
-  } catch (err) {
-    notify({
-      title: "Ошибка",
-      message: "Произошла сетевая ошибка",
-      type: "danger",
-    });
-  } finally {
-    setLoader(false);
-  }
-};
-
+  };
 
   return (
     <div className="flex flex-col gap-[40px] p-[20px]">
@@ -215,8 +210,8 @@ const updatePassword = async () => {
 
       {error !== "" && <ErrorPopup text={errorPop} setError={setErrorPop} />}
       {showEmailPopup && (
-        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-99 h-screen flex">
-          <div className="bg-[#DDEDD1] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[20px]">
+        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--main)]/50 dark:bg-[var(--main)]/10 z-99 h-screen flex">
+          <div className="bg-[var(--bg)] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[20px]">
             <h3 className="text-2xl">Новый email</h3>
             <InputText
               placeholder="Введите новый email"
@@ -228,13 +223,13 @@ const updatePassword = async () => {
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setShowEmailPopup(false)}
-                className="px-4 py-2 rounded-xl bg-[#646d5c]/25 text-[#646d5c] hover:bg-[#646d5c]/40"
+                className="px-4 py-2 rounded-xl bg-[var(--main)]/25 text-[var(--main)] hover:bg-[var(--main)]/40"
               >
                 Отмена
               </button>
               <button
                 onClick={updateEmail}
-                className="px-4 py-2 rounded-xl bg-[#646d5c]/90 text-white hover:bg-[#646d5c]"
+                className="px-4 py-2 rounded-xl bg-[var(--main)]/90 text-white hover:bg-[var(--main)]"
               >
                 Отправить
               </button>
@@ -243,8 +238,8 @@ const updatePassword = async () => {
         </div>
       )}
       {showPasswordPopup && (
-        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-99 h-screen flex">
-          <div className="bg-[#DDEDD1] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[20px]">
+        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--main)]/50 dark:bg-[var(--main)]/10   z-99 h-screen flex">
+          <div className="bg-[var(--bg)] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[20px]">
             <h3 className="text-2xl">Новый пароль</h3>
             <InputText
               placeholder="Введите новый пароль"
@@ -256,13 +251,13 @@ const updatePassword = async () => {
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setShowPasswordPopup(false)}
-                className="px-4 py-2 rounded-xl bg-[#646d5c]/25 text-[#646d5c] hover:bg-[#646d5c]/40"
+                className="px-4 py-2 rounded-xl bg-[var(--main)]/25 text-[var(--main)] hover:bg-[var(--main)]/40"
               >
                 Отмена
               </button>
               <button
                 onClick={updatePassword}
-                className="px-4 py-2 rounded-xl bg-[#646d5c]/90 text-white hover:bg-[#646d5c]"
+                className="px-4 py-2 rounded-xl bg-[var(--main)]/90 text-white hover:bg-[var(--main)]"
               >
                 Отправить
               </button>
@@ -304,7 +299,7 @@ const updatePassword = async () => {
               <div className="flex gap-[0px_20px] flex-wrap">
                 <button
                   className={`p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
-    bg-[#646d5c]/90 cursor-pointer hover:bg-[#646d5c] mt-[10px]`}
+    bg-[var(--main)]/90 cursor-pointer hover:bg-[var(--main)] mt-[10px]`}
                   onClick={() => {
                     setNewEmail(userInfo.email);
                     setShowEmailPopup(true);
@@ -315,7 +310,7 @@ const updatePassword = async () => {
 
                 <button
                   className={`p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
-    bg-[#646d5c]/90 cursor-pointer hover:bg-[#646d5c] mt-[10px]`}
+    bg-[var(--main)]/90 cursor-pointer hover:bg-[var(--main)] mt-[10px]`}
                   onClick={() => setShowPasswordPopup(true)}
                 >
                   Изменить пароль
@@ -348,8 +343,8 @@ const updatePassword = async () => {
                 className={`p-[10px_25px] w-fit rounded-xl text-white justify-center text-[20px] whitespace-nowrap
     ${
       isFiltersChanged
-        ? "bg-[#646d5c]/90 cursor-pointer hover:bg-[#646d5c]"
-        : "opacity-50 pointer-events-none bg-[#646d5c]/40 cursor-default"
+        ? "bg-[var(--main)]/90 cursor-pointer hover:bg-[var(--main)]"
+        : "opacity-50 pointer-events-none bg-[var(--main)]/40 cursor-default"
     }`}
                 onClick={isFiltersChanged ? updateUserInfo : undefined}
               >
@@ -363,8 +358,7 @@ const updatePassword = async () => {
               </p>
 
               <button
-                className={`p-[10px_25px] w-fit rounded-xl text-white justify-center text-[20px] whitespace-nowrap bg-[#646d5c]/90 cursor-pointer hover:bg-[#646d5c]
-   `}
+                className={`p-[10px_25px] w-fit rounded-xl text-white justify-center text-[20px] whitespace-nowrap bg-[var(--main)]/90 cursor-pointer hover:bg-[var(--main)]`}
                 onClick={() => setAddInfo(true)}
               >
                 Добавить фильтры
@@ -377,8 +371,8 @@ const updatePassword = async () => {
       )}
 
       {addInfo && (
-        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[#646D5C]/50 z-99 h-screen flex ">
-          <div className="bg-[#DDEDD1] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[30px]">
+        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--main)]/50 dark:bg-[var(--main)]/10 z-99 h-screen flex ">
+          <div className="bg-[var(--bg)] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[30px]">
             <p className="text-2xl">Введите информацию фильтров</p>
             <div className="flex flex-col gap-[10px] w-full">
               {Object.entries(filters).map(([key, value]) => (
@@ -400,7 +394,7 @@ const updatePassword = async () => {
             <div className="grid grid-cols-2 gap-[10px] w-full">
               <button
                 onClick={() => setAddInfo(false)}
-                className="p-[10px_25px] w-full bg-[#646d5c]/25 rounded-xl text-[#646d5c] justify-center text-[20px]   hover:bg-[#646d5c]/40 whitespace-nowrap"
+                className="p-[10px_25px] w-full bg-[var(--main)]/25 rounded-xl text-[var(--main)] justify-center text-[20px]   hover:bg-[var(--main)]/40 whitespace-nowrap"
               >
                 Отмена
               </button>
@@ -408,8 +402,8 @@ const updatePassword = async () => {
                 className={`p-[10px_25px]  rounded-xl text-white justify-center text-[20px] whitespace-nowrap
     ${
       isFiltersChanged
-        ? "bg-[#646d5c]/90 cursor-pointer hover:bg-[#646d5c]"
-        : "opacity-50 pointer-events-none bg-[#646d5c]/40 cursor-default"
+        ? "bg-[var(--main)]/90 cursor-pointer hover:bg-[var(--main)]"
+        : "opacity-50 pointer-events-none bg-[var(--main)]/40 cursor-default"
     }`}
                 onClick={isFiltersChanged ? updateUserInfo : undefined}
               >

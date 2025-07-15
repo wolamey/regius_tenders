@@ -1,9 +1,12 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import svgr from 'vite-plugin-svgr';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import svgr from "vite-plugin-svgr";
 // https://vite.dev/config/
 export default defineConfig({
-   base: '/regius_tenders/',
-  plugins: [react(),tailwindcss(), svgr()],
-})
+  base: "/regius_tenders/",
+  plugins: [react(), tailwindcss(), svgr()],
+   server: {
+    host: true, 
+  },
+});

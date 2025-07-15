@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import "./Auth.scss";
 import ErrorPopup from "../../Components/ErrorPopup/ErrorPopup";
@@ -13,7 +13,12 @@ export default function Auth() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const [cookies, setCookie, removeCookie] = useCookies(["auth_token", "user_email"]);
+  const [cookies, setCookie, removeCookie] = useCookies([
+    "auth_token",
+    "user_email",
+    "theme",
+    "isDark",
+  ]);
   const handleSubmit = async (e) => {
     setLoading(true);
 
@@ -37,7 +42,7 @@ export default function Auth() {
           path: "/regius_tenders",
           maxAge: 3600,
         });
-            setCookie("refresh_token", data.refresh_token, {
+        setCookie("refresh_token", data.refresh_token, {
           path: "/regius_tenders",
           maxAge: 86400,
         });
@@ -62,11 +67,50 @@ export default function Auth() {
 
   const backDeco = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
 
+  const themes = [
+    {
+      name: "green",
+    },
+    {
+      name: "purple",
+    },
+    {
+      name: "",
+      img: "",
+    },
+  ];
+
+  const bodyTag = document.querySelector("body");
+  useEffect(() => {
+    themes.map((item) => {
+      if (bodyTag.classList.contains(item.name)) {
+        bodyTag.classList.remove(item.name);
+      }
+    });
+    bodyTag.classList.add(cookies.theme);
+  }, [cookies.theme]);
+  useEffect(() => {
+    if (!cookies.theme)
+      setCookie("theme", "green", {
+        path: "/",
+        expires: new Date("2099-12-31"),
+      });
+  });
+  useEffect(() => {
+    if (cookies.isDark) {
+      bodyTag.classList.remove("light");
+      bodyTag.classList.add("dark");
+    } else {
+      bodyTag.classList.remove("dark");
+      bodyTag.classList.add("light");
+    }
+  });
+
   return (
     <div className="auth flex h-screen w-screen overflow-hidden relative ">
       {error !== "" && <ErrorPopup errText={error} setError={setError} />}
       {loading && <Loader isFull={true} />}
-      <div className=" z-0 w-screen absolute text-[#D2E3C8] text-[300px] md:text-[200px]  lg:text-[300px]  max-[768px]:text-[100px] font-black leading-60 md:leading-40 lg:leading-60 max-[768px]:leading-20 transform-[translate(-50%,-50%)]  top-[50%] left-[50%]  ">
+      <div className=" z-0 w-screen absolute text-[var(--bg2)] text-[300px] md:text-[200px]  lg:text-[300px]  max-[768px]:text-[100px] font-black leading-60 md:leading-40 lg:leading-60 max-[768px]:leading-20 transform-[translate(-50%,-50%)]  top-[50%] left-[50%] bg-[var(--bg2)] ">
         {backDeco.map((item, index) => (
           <div key={index}>
             <Marquee
@@ -135,12 +179,12 @@ export default function Auth() {
 
           <input
             type="submit"
-            className="button auth_submit w-fit m-auto pl-[40px] pr-[40px] pt-[20px] pb-[20px] bg-[#93A188] border-2  border-transparent cursor-pointer rounded-md text-white uppercase text-xl hover:bg-transparent hover:border-2 hover:border-[#93A188] hover:text-[#93A188] big-button"
-            value={'Войти'}
+            className="button auth_submit w-fit m-auto pl-[40px] pr-[40px] pt-[20px] pb-[20px] bg-[var(--main)]/80 border-2  border-transparent cursor-pointer rounded-md text-white uppercase text-xl hover:bg-transparent hover:border-2 hover:border-[var(--main)]/80 hover:text-[var(--main)]/80 big-button"
+            value={"Войти"}
           />
           <Link
             to="/register"
-            className="button auth_register text-center text-[#93A188] underline hover:text-black"
+            className="button auth_register text-center text-[var(--main)]/80 underline hover:text-black"
           >
             Зарегистрироваться
           </Link>
