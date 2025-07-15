@@ -66,7 +66,7 @@ const App = () => {
         path: "/regius_tenders",
         maxAge: 86400,
       });
-      alert("refreshed");
+      // alert("refreshed");
       return data.access_token;
     } catch (err) {
       console.error("Ошибка при обновлении токена:", err);

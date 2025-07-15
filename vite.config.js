@@ -6,7 +6,5 @@ import svgr from "vite-plugin-svgr";
 export default defineConfig({
   base: "/regius_tenders/",
   plugins: [react(), tailwindcss(), svgr()],
-   server: {
-    host: true, 
-  },
+
 });

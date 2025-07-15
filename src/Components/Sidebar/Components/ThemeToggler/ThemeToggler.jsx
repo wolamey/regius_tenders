@@ -12,7 +12,7 @@ export default function ThemeToggler({isDark}) {
     setCookie("theme", theme, { path: "/", expires: new Date("2099-12-31") });
   };
 
-  console.log(isDark)
+  // console.log(isDark)
   const themes = [
     {
       name: "green",
