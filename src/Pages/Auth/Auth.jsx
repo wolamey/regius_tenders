@@ -39,11 +39,11 @@ export default function Auth() {
       const data = await response.json();
       if (response.ok) {
         setCookie("auth_token", data.access_token, {
-          path: "/regius_tenders",
+          path: "/cabinet",
           maxAge: 3600,
         });
         setCookie("refresh_token", data.refresh_token, {
-          path: "/regius_tenders",
+          path: "/cabinet",
           maxAge: 86400,
         });
         navigate("/");

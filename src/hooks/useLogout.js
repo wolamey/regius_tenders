@@ -15,8 +15,8 @@ export function useLogout() {
 
   
   
-    removeCookie("auth_token", { path: "/regius_tenders" });
-    removeCookie("refresh_token", { path: "/regius_tenders" });
+    removeCookie("auth_token", { path: "/cabinet" });
+    removeCookie("refresh_token", { path: "/cabinet" });
 
     navigate("/auth");
   }, [removeCookie, navigate]);
