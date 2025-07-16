@@ -14,7 +14,6 @@ export default function Settings({ refreshToken }) {
     useUserInfo(refreshToken);
   if (error) setError(error);
 
-
   const logout = useLogout();
 
   const [filters, setFilters] = useState({});
@@ -204,86 +203,86 @@ export default function Settings({ refreshToken }) {
     }
   };
 
-  const [platforms, setPlatforms] = useState([]);
+  const [allPlatforms, setAllPlatforms] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
 
+  // Load all available platforms
   const getPlatforms = async () => {
     try {
       const response = await fetch(
         "https://tendersiteapi.dev.regiuslab.by/v1/platforms/get_all",
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
-        }
+        { method: "GET", headers: { Accept: "application/json" } }
       );
+      if (response.status === 404) return logout();
       const data = await response.json();
-      // console.log(data);
-      if (response.status === 404) {
-        logout();
-      }
-      if (response.ok) {
-        setPlatforms(data);
-      }
+      if (response.ok) setAllPlatforms(data);
     } catch (err) {
-      // setError(err);
-
-      notify({
-        title: "Ошибка",
-        message: err,
-        type: "danger",
-      });
+      notify({ title: "Ошибка", message: err.toString(), type: "danger" });
     }
   };
+
   useEffect(() => {
     getPlatforms();
   }, []);
 
+  // Initialize selected platform IDs
+  useEffect(() => {
+    if (userInfo?.platforms) {
+      setSelectedIds(userInfo.platforms.map((p) => p.id));
+    }
+  }, [userInfo]);
 
-
-
-  const [platformsMy, setPlatformsMy] = useState([])
-
-    const updatePlatforms = async () => {
+  // Toggle selection and sync
+  const handleToggle = async (platformId) => {
     setLoader(true);
+    const newIds = selectedIds.includes(platformId)
+      ? selectedIds.filter((id) => id !== platformId)
+      : [...selectedIds, platformId];
+    setSelectedIds(newIds);
+
+    // Prepare payload
+    const selectedPlatforms = newIds.map((id) => {
+      const plat = allPlatforms.find((p) => p.id === id);
+      return { name: plat.name, region: plat.region, url: plat.url };
+    });
+
     try {
-      const { data, response } = await tryProtectedRequest({
+      const { response } = await tryProtectedRequest({
         url: "https://tendersiteapi.dev.regiuslab.by/v1/user/me",
         method: "PATCH",
-        body: { selected_platforms: platformsMy },
+        body: { selected_platforms: selectedPlatforms },
         token: cookies.auth_token,
         refreshToken,
         logout,
       });
-
-      if (!response.ok) {
+      if (response.ok) {
+        notify({
+          title: "Успешно",
+          message: "Платформы обновлены",
+          type: "success",
+        });
+        refreshUserInfo();
+      } else {
         notify({
           title: "Ошибка",
-          message: data.message || "Ошибка обновления email",
+          message: "Не удалось обновить платформы",
           type: "danger",
         });
-        return;
       }
-
-      notify({
-        title: "Успешно",
-        message: "Email успешно обновлен",
-        type: "success",
-      });
-
-      refreshUserInfo();
-      setShowEmailPopup(false);
     } catch (err) {
-      notify({
-        title: "Ошибка",
-        message: "Произошла сетевая ошибка",
-        type: "danger",
-      });
+      notify({ title: "Ошибка", message: "Сетевая ошибка", type: "danger" });
     } finally {
       setLoader(false);
     }
   };
 
+  // Split lists
+  const selectedPlatforms = allPlatforms.filter((p) =>
+    selectedIds.includes(p.id)
+  );
+  const availablePlatforms = allPlatforms.filter(
+    (p) => !selectedIds.includes(p.id)
+  );
 
   return (
     <div className="flex flex-col gap-[40px] p-[20px]">
@@ -403,121 +402,62 @@ export default function Settings({ refreshToken }) {
             </div>
           </div>
 
-          <div className="flex flex-col gap-[30px]">
-            <p className="text-3xl font-medium ">Выбранные платформы</p>
-            <div className="flex gap-5">
-              {userInfo.platforms.map((item, index) => (
-                <div
-                  className="bg-[var(--main)]/10  border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item flex flex-col gap-3 "
-                  key={index}
-                >
-                  <div className="">
-                    <p className="text-xs opacity-60 col-span-full ">
-                      Название:
-                    </p>
-                    <p className="card_info-item col-span-full uppercase">
-                      {item.name}
-                    </p>
-                  </div>
-
-                  <div className="">
-                    <p className="text-xs opacity-60 col-span-full ">Регион:</p>
-                    <p className="card_info-item col-span-full uppercase">
-                      {item.region}
-                    </p>
-                  </div>
-                </div>
-              ))}
-
-              {platforms && platforms.length > userInfo.platforms.length ? (
-                <div className="">
-                  <div className="bg-[var(--main)]/10 hover:bg-[var(--main)]/30  border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item flex flex-col  gap-2 justify-center items-center h-full">
-                    <p className=" col-span-full ">Добавить платформу</p>
-                    <div className=" col-span-full uppercase w-[40px] h-[40px] flex justify-center items-center rounded-xl  bg-[var(--main)] p-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="35"
-                        height="35"
-                        viewBox="0 0 35 35"
-                        fill="none"
-                      >
-                        <path
-                          d="M17.5 4L17.5 31"
-                          stroke="currentColor"
-                          stroke-width="7"
-                          stroke-linecap="round"
-                        />
-                        <path
-                          d="M31 18.5L4 18.5"
-                          stroke="currentColor"
-                          stroke-width="7"
-                          stroke-linecap="round"
-                        />
-                      </svg>
+          <div className="flex flex-col gap-4">
+            <p className="text-2xl font-medium">Выбранные платформы</p>
+            <div className="flex flex-wrap gap-4">
+              {selectedPlatforms.length > 0 ? (
+                selectedPlatforms.map((platform) => (
+                  <div
+                    key={platform.id}
+                    className="flex flex-col items-start gap-2"
+                  >
+                    <div className="p-3 rounded-lg border border-main bg-main/10">
+                      <p className="uppercase font-semibold">{platform.name}</p>
+                      <p className="text-xs opacity-60 uppercase">
+                        {platform.region}
+                      </p>
                     </div>
+                    <button
+                      onClick={() => handleToggle(platform.id)}
+                      className="px-4 py-2 rounded-xl bg-red-200 text-red-800 border-red-400 border min-w-[100px]"
+                    >
+                      Удалить
+                    </button>
                   </div>
+                ))
+              ) : selectedIds.length === 0 ? (
+                <p>Нет выбранных платформ</p>
+              ) : (
+                <Loader isFull={false} color={"var(--main)"} />
+              )}
+            </div>
+          </div>
 
-                  <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--main)]/50 z-999 h-screen flex">
-                    <div className="bg-[var(--bg)] max-w-[90vh] m-auto  p-[30px] rounded-2xl flex flex-col gap-[20px] max-h-[90vh] overflow-y-auto w-fit">
-                      <p className="text-2xl text-center">Все платформы</p>
-                      <div className=" overflow-auto">
-                        <div className="flex flex-col gap-1 min-w-[400px] overflow-auto max-h-[80%] ">
-                          {platforms.map((item, index) => {
-                            const isUserPlatform = userInfo.platforms.some(
-                              (p) => p.name === item.name
-                            );
-
-                            return (
-                              <div className="flex gap-4">
-                                <div
-                                  className={`
-        grid grid-cols-2 gap-10 bg-[var(--bg2)] p-[10px_15px]
-        rounded-xl text-sm  w-full
-        ${
-          isUserPlatform
-            ? "border-2 border-[var(--main)]"
-            : " border-2 border-transparent  cursor-pointer hover:border-[var(--main)]/50"
-        }
-      `}
-                                  key={index}
-                                >
-                                  <div className="">
-                                    <p className="text-xs opacity-60 col-span-full ">
-                                      Название:
-                                    </p>
-                                    <p className="card_info-item col-span-full uppercase">
-                                      {item.name}
-                                    </p>
-                                  </div>
-
-                                  <div className="">
-                                    <p className="text-xs opacity-60 col-span-full ">
-                                      Регион:
-                                    </p>
-                                    <p className="card_info-item col-span-full uppercase">
-                                      {item.region}
-                                    </p>
-                                  </div>
-                                </div>
-
-                                <button
-                                  className={`${
-                                    !isUserPlatform
-                                      ? "bg-[var(--main)]/90 text-white hover:bg-[var(--main)]"
-                                      : "bg-[#FFD7D7] text-[#682121] border-[#B05959] border-2 hover:bg-[#dd7b7b] "
-                                  } p-[7px_15px]  rounded-xl justify-center whitespace-nowrap
-     cursor-pointer   min-w-[100px]`}
-                                >
-                                  {isUserPlatform ? "Удалить" : "Добавить"}
-                                </button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
+          {/* Доступные платформы */}
+          <div className="flex flex-col gap-4">
+            <p className="text-2xl font-medium">Доступные платформы</p>
+            <div className="flex flex-wrap gap-4">
+              {availablePlatforms.length > 0 ? (
+                availablePlatforms.map((platform) => (
+                  <div
+                    key={platform.id}
+                    className="flex flex-col items-start gap-2 p-3 rounded-lg border border-main bg-main/10"
+                  >
+                    <div className=" rounded-lg border border-transparent hover:border-main/50">
+                      <p className="uppercase font-semibold">{platform.name}</p>
+                      <p className="text-xs opacity-60 uppercase">
+                        {platform.region}
+                      </p>
                     </div>
+                    <button
+                      onClick={() => handleToggle(platform.id)}
+                      className="px-4 py-2 rounded-xl bg-main/90 text-white hover:bg-main min-w-[100px] p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
+    bg-[var(--main)]/90 cursor-pointer hover:bg-[var(--main)] "
+                    >
+                      Добавить
+                    </button>
                   </div>
-                </div>
+                ))
               ) : (
                 <Loader isFull={false} color={"var(--main)"} />
               )}
