@@ -45,7 +45,7 @@ export default function Register() {
 
         setCookie("auth_token", data.access_token, { path: "/", maxAge: 3600 });
              setCookie("refresh_token", data.refresh_token, {
-          path: "/cabinet",
+          path: "/",
           maxAge: 86400,
         });
 
