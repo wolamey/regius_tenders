@@ -458,7 +458,14 @@ export default function Settings({ refreshToken }) {
                     </button>
                   </div>
                 ))
-              ) : (
+              ) :
+              
+              allPlatforms.length === selectedIds.length ? (
+                <p>Все платформы выбраны</p>
+                
+
+              ):
+              (
                 <Loader isFull={false} color={"var(--main)"} />
               )}
             </div>
