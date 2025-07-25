@@ -8,6 +8,7 @@ import InfoPopup from "../../Components/InfoPopup/InfoPopup";
 import ErrorPopup from "../../Components/ErrorPopup/ErrorPopup";
 import { notify } from "../../utils/notify";
 import { tryProtectedRequest } from "../../utils/tryProtectedRequest";
+import Regions from "./Components/Regions";
 
 export default function Settings({ refreshToken }) {
   const { userInfo, error, setError, refreshUserInfo } =
@@ -44,7 +45,7 @@ export default function Settings({ refreshToken }) {
       setInitialFilters(userInfo.filter);
     }
   }, [userInfo]);
-
+ 
   const isFiltersChanged =
     JSON.stringify(filters) !== JSON.stringify(initialFilters);
 
@@ -285,7 +286,7 @@ export default function Settings({ refreshToken }) {
   );
 
   return (
-    <div className="flex flex-col gap-[40px] p-[20px]">
+    <div className="flex flex-col gap-[50px] sm:p-[20px_40px] p-[20px]">
       {loader && <Loader isFull={true} />}
 
       {/* {info !== "" && <InfoPopup text={info} setInfo={setInfo} />} */}
@@ -402,7 +403,10 @@ export default function Settings({ refreshToken }) {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4">
+
+          <Regions refreshToken={refreshToken} />
+
+          {/* <div className="flex flex-col gap-4">
             <p className="text-2xl font-medium">Выбранные платформы</p>
             <div className="flex flex-wrap gap-4">
               {selectedPlatforms.length > 0 ? (
@@ -433,7 +437,6 @@ export default function Settings({ refreshToken }) {
             </div>
           </div>
 
-          {/* Доступные платформы */}
           <div className="flex flex-col gap-4">
             <p className="text-2xl font-medium">Доступные платформы</p>
             <div className="flex flex-wrap gap-4">
@@ -469,7 +472,7 @@ export default function Settings({ refreshToken }) {
                 <Loader isFull={false} color={"var(--main)"} />
               )}
             </div>
-          </div>
+          </div> */}
 
           {filterSum !== "" ? (
             <div className="flex flex-col gap-[30px]">

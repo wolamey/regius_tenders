@@ -76,7 +76,6 @@ const App = () => {
 
   return (
     <div className="app">
-      <ReactNotifications />
 
       <Routes>
         {/* Публичные страницы */}

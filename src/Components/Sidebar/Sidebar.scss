@@ -1,24 +1,23 @@
+.tab_item {
+  color: var(--main);
 
-
-.tab_item.active {
-  color: var(--bg);
-
-  p {
-    color: var(--bg);
-  }
   svg {
-    color: var(--bg);
-
+    color: var(--main);
   }
 }
-svg {
-  color: #fff;
+
+.tab_item.active {
+  color: var(--main);
+
+  p {
+    color: var(--main);
+  }
+  svg {
+    color: var(--main);
+  }
 }
 
 .tab_item:hover {
-  svg {
-    color: var(--bg) !important;
-  }
 }
 
 .sidebar_item svg {
@@ -33,28 +32,60 @@ svg {
       color: #fff;
     }
     svg {
-      color: #fff;
     }
 
-    &:hover{
-      opacity: 1;
-    p {
-      color: #fff !important;
-    }
-    svg {
-      color: #fff !important;
-    }      
+    &:hover {
+      p {
+        color: #fff !important;
+      }
+      svg {
+      }
     }
   }
+}
 
-  .tab_item:hover{
-    opacity: 0.7;
-    p {
-      color: #fff !important;
+.sidebar {
+
+   .tab_item{
+        p {
+      color: #fff;
     }
     svg {
-      color: #fff !important;
-    }      
+      color: #fff;
     }
-  
+   }
+  .tab_item.active {
+    color: var(--bg);
+
+    p {
+      color: #fff;
+    }
+    svg {
+      color: #fff;
+    }
+  }
+ 
+
+
+
+  }
+  .dark {
+.sidebar {
+
+  .sidebar_item svg {
+    min-width: 23px;
+  }
+
+    .tab_item.active {
+      color: var(--main);
+
+      p {
+        color: var(--main);
+      }
+      svg {
+        color: var(--main);
+      }
+    }
+
+    }
 }

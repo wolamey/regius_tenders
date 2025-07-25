@@ -22,6 +22,9 @@ const Layout = ({ children, pageName,refreshToken }) => {
 
   return (
     <div className="layout h-screen overflow-hidden flex w-full ">
+
+        {screenWidth < 1024 && (
+
       <Sidebar
         pageName={pageName}
         isSideBarHidden={isSideBarHidden}
@@ -30,14 +33,16 @@ const Layout = ({ children, pageName,refreshToken }) => {
           refreshToken={refreshToken}
 
       />
-      <div className="flex flex-col gap-[20px] w-full h-screen">
+
+        )}
+      <div className="flex flex-col gap-[20px] w-full h-screen bg-[var(--bg)]">
         <UserInfoLine
           isSideBarHidden={isSideBarHidden}
           setIsSideBarHidden={setIsSideBarHidden}
           screenWidth={screenWidth}
           refreshToken={refreshToken}
         />
-        <div className=" flex flex-col overflow-auto ">{children}</div>
+        <div className=" flex flex-col overflow-x-hidden overflow-y-auto w-full   mx-auto max-w-[1400px] ">{children}</div>
       </div>
     </div>
   );

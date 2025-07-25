@@ -2,6 +2,8 @@
 @import "hamburgers/dist/hamburgers.css";
 @import "react-notifications-component/dist/theme.css";
 @import "animate.css/animate.min.css";
+@import "@radix-ui/themes/styles.css";
+
 
 * {
   transition: 0.5s;
@@ -26,10 +28,13 @@ body {
   --clean: #FFC7C7;
 
   --filters: white;
+
+  --color: #000000;
+
 }
 
 body.green {
-  --bg: #ddedd1;
+  --bg: #e7ece3;
   --bg2: #f6fcf2;
   --main: #646d5c;
   --lots: #fff;
@@ -44,6 +49,7 @@ body.green.dark {
 }
 body.dark {
   color: #fff;
+  --color: #ffffff;
 
   --input: rgba(195, 195, 195, 0.209);
   --clean: #ffc7c75f;
@@ -73,6 +79,14 @@ body.purple.dark  {
 .dark .input_comp {
 
 
+}
+
+.search_input{
+  background-image: url(/src/assets/images/search.svg) ;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: 10px center ;
+  background-size: 15px ;
 }
 
 .item-button-svg {
@@ -225,6 +239,13 @@ a {
   );
 }
 
+.tag{
+  line-height: 14px;
+  padding: 5px 10px
+  ;
+  white-space: nowrap;
+}
+
 @media (max-width: 1600px) {
 }
 @media (max-width: 1300px) {
@@ -234,8 +255,8 @@ a {
     align-items: stretch;
   }
   .btn-wrapper {
-    flex-direction: row;
-    flex-wrap: nowrap;
+    /* flex-direction: row;
+    flex-wrap: nowrap; */
   }
   .btn-wrapper button {
   }
@@ -256,11 +277,11 @@ a {
 }
 @media (max-width: 900px) {
   .btn-wrapper {
-    display: flex;
-    flex-direction: column;
+    /* display: flex;
+    flex-direction: column; */
   }
   .btn-wrapper button {
-    width: 100%;
+    /* width: 100%; */
   }
 }
 
@@ -297,12 +318,20 @@ a {
     font-size: 16px;
     padding: 5px 10px;
   }
+    .btn-wrapper a {
+    font-size: 16px;
+    padding: 5px 10px;
+  }
   .btn-wrapper button svg {
     width: 20px;
     max-width: 20px;
     min-width: 0;
   }
-
+  .btn-wrapper a svg {
+    width: 20px;
+    max-width: 20px;
+    min-width: 0;
+  }
   .text-2xl {
     font-size: 20px;
   }

@@ -17,7 +17,7 @@ export default function DayNightToggler() {
     }
   } );
   return (
-    <div className="toggleWrapper">
+    <div className="toggleWrapper h-[30px] overflow-hidden">
       <input
         checked={cookie.isDark}
         onChange={() => setCookie("isDark", !cookie.isDark)}
