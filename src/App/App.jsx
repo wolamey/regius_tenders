@@ -9,6 +9,7 @@ import Layout from "../Components/Layout/Layout";
 import Home from "../Pages/Home/Home";
 import Settings from "../Pages/Settings/Settings";
 import RequireAuth from "../Components/RequireAuth/RequireAuth";
+import Pro from "../Pages/Pro/Pro";
 
 // Компонент для подгрузки Bitrix24-чата
 const BitrixScript = () => {
@@ -106,6 +107,16 @@ const App = () => {
               </>
             }
           />
+
+
+          <Route path="/pro" element={
+                <>
+                <BitrixScript />
+                <Layout refreshToken={refreshToken} pageName="PRO">
+                  <Pro refreshToken={refreshToken} />
+                </Layout>
+              </>
+          }/>
         </Route>
       </Routes>
     </div>

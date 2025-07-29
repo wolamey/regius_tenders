@@ -286,14 +286,14 @@ export default function Settings({ refreshToken }) {
   );
 
   return (
-    <div className="flex flex-col gap-[50px] sm:p-[20px_40px] p-[20px]">
+    <div className=" md:grid md:grid-cols-2 flex gap-5 flex-col  md:gap-[50px] sm:p-[20px_40px] p-[20px]">
       {loader && <Loader isFull={true} />}
 
       {/* {info !== "" && <InfoPopup text={info} setInfo={setInfo} />} */}
 
       {error !== "" && <ErrorPopup text={errorPop} setError={setErrorPop} />}
       {showEmailPopup && (
-        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--main)]/50 dark:bg-[var(--main)]/10 z-99 h-screen flex">
+        <div className="absolute  top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--main)]/60  z-99 h-screen flex">
           <div className="bg-[var(--bg)] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[20px]">
             <h3 className="text-2xl">Новый email</h3>
             <InputText
@@ -322,7 +322,7 @@ export default function Settings({ refreshToken }) {
       )}
 
       {showPasswordPopup && (
-        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--main)]/50 dark:bg-[var(--main)]/10   z-99 h-screen flex">
+        <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--main)]/60    z-99 h-screen flex">
           <div className="bg-[var(--bg)] max-w-[500px] m-auto w-full p-[30px] rounded-2xl flex flex-col items-center gap-[20px]">
             <h3 className="text-2xl">Новый пароль</h3>
             <InputText
@@ -351,7 +351,7 @@ export default function Settings({ refreshToken }) {
       )}
       {userInfo ? (
         <>
-          <div className="flex flex-col gap-[30px]">
+          <div className="flex flex-col gap-[30px] bg-[var(--bg2)] p-5 rounded-lg">
             <p className="text-3xl font-medium ">Учетные данные</p>
 
             <div className="flex flex-col gap-[20px]">
@@ -403,9 +403,9 @@ export default function Settings({ refreshToken }) {
             </div>
           </div>
 
-
-          <Regions refreshToken={refreshToken} />
-
+<div className="bg-[var(--bg2)] p-5 rounded-lg">
+          <Regions refreshToken={refreshToken}  />
+</div>
           {/* <div className="flex flex-col gap-4">
             <p className="text-2xl font-medium">Выбранные платформы</p>
             <div className="flex flex-wrap gap-4">
@@ -475,7 +475,7 @@ export default function Settings({ refreshToken }) {
           </div> */}
 
           {filterSum !== "" ? (
-            <div className="flex flex-col gap-[30px]">
+            <div className="flex flex-col gap-[30px] bg-[var(--bg2)] p-5 rounded-lg col-span-2">
               <p className="text-3xl font-medium ">Фильтр</p>
               <div className="flex flex-col gap-[10px]">
                 {Object.entries(filters).map(([key, value]) => (
@@ -546,7 +546,7 @@ export default function Settings({ refreshToken }) {
               ))}
             </div>
 
-            <div className="grid grid-cols-2 gap-[10px] w-full">
+            <div className="grid grid-cols-2  gap-[10px] w-full">
               <button
                 onClick={() => setAddInfo(false)}
                 className="p-[10px_25px] w-full bg-[var(--main)]/25 rounded-xl text-[var(--main)] justify-center text-[20px]   hover:bg-[var(--main)]/40 whitespace-nowrap"

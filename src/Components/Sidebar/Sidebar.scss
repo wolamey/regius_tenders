@@ -17,8 +17,7 @@
   }
 }
 
-.tab_item:hover {
-}
+
 
 .sidebar_item svg {
   min-width: 23px;
@@ -29,14 +28,12 @@
     color: var(--bg);
 
     p {
-      color: #fff;
     }
     svg {
     }
 
     &:hover {
       p {
-        color: #fff !important;
       }
       svg {
       }

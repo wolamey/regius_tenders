@@ -50,6 +50,7 @@ body.green.dark {
 body.dark {
   color: #fff;
   --color: #ffffff;
+  --second: #646d5c6f;
 
   --input: rgba(195, 195, 195, 0.209);
   --clean: #ffc7c75f;
@@ -80,6 +81,12 @@ body.purple.dark  {
 
 
 }
+
+
+.rt-SwitchRoot:where(.rt-variant-surface)::before{
+  background-image: linear-gradient(to right, var(--main) 40%, transparent 60%);
+}
+
 
 .search_input{
   background-image: url(/src/assets/images/search.svg) ;

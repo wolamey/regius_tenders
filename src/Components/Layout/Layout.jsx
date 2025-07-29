@@ -42,7 +42,7 @@ const Layout = ({ children, pageName,refreshToken }) => {
           screenWidth={screenWidth}
           refreshToken={refreshToken}
         />
-        <div className=" flex flex-col overflow-x-hidden overflow-y-auto w-full   mx-auto max-w-[1400px] ">{children}</div>
+        <div className="h-full flex flex-col overflow-x-hidden overflow-y-auto w-full   mx-auto max-w-[1400px] ">{children}</div>
       </div>
     </div>
   );

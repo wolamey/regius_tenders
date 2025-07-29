@@ -125,12 +125,13 @@ export default function Regions({ refreshToken }) {
                   align="center"
                   gap="4"
                   style={{ cursor: "pointer" }}
-                  onClick={() => toggleRegion(code)}
+                  // onClick={() => toggleRegion(code)}
                 >
                   <Switch
                     radius="full"
                     checked={userRegions.includes(code)}
                     onCheckedChange={() => toggleRegion(code)}
+                    
                   />
                   {name}
                 </Flex>
