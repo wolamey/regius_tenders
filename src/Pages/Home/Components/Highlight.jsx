@@ -19,7 +19,7 @@ export function Highlight({ text = "", highlight = "" }) {
     <>
       {parts.map((part, index) =>
         regex.test(part) ? (
-          <span key={index} className="bg-yellow-200">
+          <span key={index} className="bg-yellow-300/40 ">
             {part}
           </span>
         ) : (

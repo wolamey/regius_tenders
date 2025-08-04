@@ -1,4 +1,12 @@
 import React from "react";
+
+import proYear from "../../assets/images/pro_year.png";
+
+import proMonth from "../../assets/images/pro_month.png";
+import proHalf from "../../assets/images/pro_half.png";
+
+import Present from "../../assets/images/present.svg?react";
+
 import "./Pro.scss";
 export default function Pro({ refreshToken }) {
   return (
@@ -56,21 +64,26 @@ export default function Pro({ refreshToken }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-5 max-w-[800px] m-auto w-full">
+      <div className="sm:grid  sm:grid-cols-3 flex flex-col gap-10 sm:gap-5 max-w-[800px] m-auto w-full">
         <div className="cardP m-auto">
           <div className="cardP__shine"></div>
           <div className="cardP__glow"></div>
           <div className="cardP__content ">
-            <div className="cardP__badge">NEW</div>
-            <div  className="cardP__image"></div>
+            <div className="cardP__badge">Самый дешевый</div>
+            <div className="cardP__image">
+              <img src={proMonth} alt="" />
+            </div>
             <div className="cardP__text">
-              <p className="cardP__title">Premium Design</p>
-              <p className="cardP__description">
-                Hover to reveal stunning effects
-              </p>
+              <p className="cardP__title">1 месяц</p>
+
+              <div className="flex gap-2  items-center">
+                <p className="cardP__description leading-3">
+                 Для тех кто хочет попробовать
+                </p>
+              </div>
             </div>
             <div className="cardP__footer">
-              <div className="cardP__price">$49.99</div>
+              <div className="cardP__price">150 BYN</div>
               <div className="cardP__button">
                 <svg height="16" width="16" viewBox="0 0 24 24">
                   <path
@@ -85,20 +98,25 @@ export default function Pro({ refreshToken }) {
           </div>
         </div>
 
-           <div className="cardP m-auto scale-120">
+        <div className="cardP m-auto scale-120">
           <div className="cardP__shine"></div>
           <div className="cardP__glow"></div>
           <div className="cardP__content">
-            <div className="cardP__badge">NEW</div>
-            <div  className="cardP__image"></div>
+            <div className="cardP__badge">Самый выгодный</div>
+            <div className="cardP__image">
+              <img src={proYear} alt="" />
+            </div>
             <div className="cardP__text">
-              <p className="cardP__title">Premium Design</p>
-              <p className="cardP__description">
-                Hover to reveal stunning effects
-              </p>
+              <p className="cardP__title">1 год</p>
+                   <div className="flex gap-2 text-[var(--main)] items-center">
+                <Present />
+                <p className="cardP__description leading-3">
+               -15% 2 или месяца бесплатно
+                </p>
+              </div>
             </div>
             <div className="cardP__footer">
-              <div className="cardP__price">$49.99</div>
+              <div className="cardP__price">1530 BYN</div>
               <div className="cardP__button">
                 <svg height="16" width="16" viewBox="0 0 24 24">
                   <path
@@ -113,20 +131,26 @@ export default function Pro({ refreshToken }) {
           </div>
         </div>
 
-           <div className="cardP m-auto">
+        <div className="cardP m-auto">
           <div className="cardP__shine"></div>
           <div className="cardP__glow"></div>
           <div className="cardP__content">
-            <div className="cardP__badge">NEW</div>
-            <div  className="cardP__image"></div>
+            <div className="cardP__badge">Идеальная середина</div>
+            <div className="cardP__image">
+              <img src={proHalf} alt="" />
+            </div>
             <div className="cardP__text">
-              <p className="cardP__title">Premium Design</p>
-              <p className="cardP__description">
-                Hover to reveal stunning effects
-              </p>
+              <p className="cardP__title">6 месяцев</p>
+                <div className="flex gap-2 text-[var(--main)] items-center">
+                <Present />
+                <p className="cardP__description leading-3">
+               
+                      -10% или 2 недели бесплатно
+                </p>
+              </div>
             </div>
             <div className="cardP__footer">
-              <div className="cardP__price">$49.99</div>
+              <div className="cardP__price">810 BYN</div>
               <div className="cardP__button">
                 <svg height="16" width="16" viewBox="0 0 24 24">
                   <path

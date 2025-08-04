@@ -48,7 +48,7 @@ export default function LotsWrap({ lots, index ,isDark}) {
       </div>
       <div className="flex gap-[10px] flex-wrap">
         {lots.map((lot) => (
-          <div key={lot.id} className="bg-[var(--bg)] p-[3px_15px] rounded-2xl">
+          <div key={lot.id} className="bg-[var(--bg)] border-1 border-[var(--lots)] p-[3px_15px] rounded-2xl">
             {lot.name}
           </div>
         ))}

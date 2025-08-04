@@ -43,9 +43,9 @@ export default function Register() {
       const data = await response.json();
       if (response.ok) {
 
-        setCookie("auth_token", data.access_token, { path: "/", maxAge: 3600 });
+        setCookie("auth_token", data.access_token, { path: "regius_tenders/", maxAge: 3600 });
              setCookie("refresh_token", data.refresh_token, {
-          path: "/",
+          path: "regius_tenders/",
           maxAge: 86400,
         });
 

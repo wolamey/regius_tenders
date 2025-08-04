@@ -10,7 +10,7 @@ export const notify = ({ title, message, type = 'default', duration = 5000, id }
   activeNotifications.add(uniqueId);
 
   Store.addNotification({
-    id: uniqueId,
+    // id: uniqueId,
     title,
     message,
     type,

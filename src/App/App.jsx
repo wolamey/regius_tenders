@@ -39,7 +39,7 @@ const BitrixScript = () => {
 
 
 const App = () => {
-  const [cookies, setCookie] = useCookies(["auth_token", "refresh_token"]);
+  const [cookies, setCookie] = useCookies(["auth_token", "refresh_token", 'theme']);
 
   // Функция для обновления токена
   const refreshToken = async () => {
@@ -60,11 +60,11 @@ const App = () => {
       if (!data) return null;
 
       setCookie("auth_token", data.access_token, {
-        path: "/",
+        path: "regius_tenders/",
         maxAge: 3600,
       });
       setCookie("refresh_token", data.refresh_token, {
-        path: "/",
+        path: "regius_tenders/",
         maxAge: 86400,
       });
       // alert("refreshed");
@@ -74,7 +74,19 @@ const App = () => {
       return null;
     }
   };
+  const bodyTag = document.querySelector("body");
 
+    useEffect(() => {
+      if (!cookies.theme){
+        setCookie("theme", "blue", {
+          path: "regius_tenders/",
+          expires: new Date("2099-12-31"),
+        })}
+         else 
+    bodyTag.classList.add(cookies.theme);
+       
+        
+    },[]);
   return (
     <div className="app">
 

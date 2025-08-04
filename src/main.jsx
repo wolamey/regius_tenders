@@ -11,7 +11,7 @@ createRoot(document.getElementById("root")).render(
   <>
     <ReactNotifications />
 
-    <BrowserRouter>
+    <BrowserRouter basename="/regius_tenders/">
       <CookiesProvider>
         <StrictMode>
           <Theme>

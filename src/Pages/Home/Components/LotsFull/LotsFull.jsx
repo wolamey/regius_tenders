@@ -14,7 +14,7 @@ export default function LotsFull({ lots, setShowFull }) {
         <p className="text-2xl text-center">Лоты: {lots.length}</p>
 
         <div className=" overflow-auto">
-        <div className="flex flex-col gap-1 min-w-[600px] overflow-auto">
+        <div className="flex flex-col gap-1 min-w-[550px] overflow-auto">
 
           <div className="flex flex-col gap-[10px] max-h-[50vh] overflow-auto">
         <div className=" p-[10px_15px] rounded-xl grid grid-cols-[1fr_3fr_1fr_1fr] text-sm gap-[20px]">

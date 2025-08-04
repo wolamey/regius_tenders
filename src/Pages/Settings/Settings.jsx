@@ -9,6 +9,7 @@ import ErrorPopup from "../../Components/ErrorPopup/ErrorPopup";
 import { notify } from "../../utils/notify";
 import { tryProtectedRequest } from "../../utils/tryProtectedRequest";
 import Regions from "./Components/Regions";
+import ThemeToggler from "../../Components/Sidebar/Components/ThemeToggler/ThemeToggler";
 
 export default function Settings({ refreshToken }) {
   const { userInfo, error, setError, refreshUserInfo } =
@@ -284,6 +285,12 @@ export default function Settings({ refreshToken }) {
   const availablePlatforms = allPlatforms.filter(
     (p) => !selectedIds.includes(p.id)
   );
+  const [isDark, setIsDark] = useState(false);
+  const bodyTag = document.querySelector("body");
+
+  useEffect(() => {
+    setIsDark(bodyTag.classList.contains("dark") ? true : false);
+  }, [bodyTag, cookies]);
 
   return (
     <div className=" md:grid md:grid-cols-2 flex gap-5 flex-col  md:gap-[50px] sm:p-[20px_40px] p-[20px]">
@@ -481,7 +488,7 @@ export default function Settings({ refreshToken }) {
                 {Object.entries(filters).map(([key, value]) => (
                   <div className="flex flex-col gap-[5px]" key={key}>
                     <p className="">{key}</p>
-                    <InputText
+                    {/* <InputText
                       placeholder={""}
                       value={value}
                       type="text"
@@ -489,7 +496,17 @@ export default function Settings({ refreshToken }) {
                       onChange={(e) =>
                         setFilters({ ...filters, [key]: e.target.value })
                       }
-                    />
+                    /> */}
+
+
+                    <textarea
+                    className="outline-0 input_comp auth_input w-full rounded-lg bg-[var(--input)] pr-[20px] pl-[20px] pt-[10px] pb-[10px] border  border-transparent
+ focus-visible:border-[var(--main)]  focus-visible:bg-[var(--main)]/10 shadow-[0px_0px_8px_0px_rgba(0,_0,_0,_0.1)]"
+                     onChange={(e) =>
+                        setFilters({ ...filters, [key]: e.target.value })
+                      }
+                      
+                    name="" id="">{value}</textarea>
                   </div>
                 ))}
               </div>
@@ -524,6 +541,7 @@ export default function Settings({ refreshToken }) {
       ) : (
         <Loader isFull={true} />
       )}
+            <ThemeToggler isDark={isDark}/>
 
       {addInfo && (
         <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--main)]/50 dark:bg-[var(--main)]/10 z-99 h-screen flex ">

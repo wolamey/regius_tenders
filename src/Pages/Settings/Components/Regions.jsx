@@ -13,6 +13,25 @@ export default function Regions({ refreshToken }) {
   const [userRegions, setUserRegions] = useState([]);
   const logout = useLogout();
 
+  const [regionsPrev, setRegionsPrev] = useState([
+    "Казахстан",
+    "Грузия",
+    "Азербайджан",
+    "Литва",
+    "Латвия",
+    "Польша",
+    "Узбекистан",
+    "Кыргызстан",
+    "Молдова",
+    "Румыния",
+    "США",
+    "Германия",
+    "Франция",
+    "Италия",
+    "Испания",
+    "Турция",
+  ]);
+
   // 1. Получить все регионы
   const getRegions = async () => {
     try {
@@ -68,8 +87,12 @@ export default function Regions({ refreshToken }) {
   // 3. Переключение одного региона с защитой от снятия всех
   const toggleRegion = (code) => {
     if (userRegions.length === 1 && userRegions[0] === code) {
-      setUserRegions([]); 
-      notify({ title: "Ошибка", message: "Нельзя отключить все регионы", type: "danger" });
+      setUserRegions([]);
+      notify({
+        title: "Ошибка",
+        message: "Нельзя отключить все регионы",
+        type: "danger",
+      });
       setTimeout(() => {
         setUserRegions(regions.map((r) => r.code));
       }, 200);
@@ -101,12 +124,24 @@ export default function Regions({ refreshToken }) {
       });
 
       if (!response.ok) {
-        notify({ title: "Ошибка", message: "Не удалось сохранить регионы", type: "danger" });
+        notify({
+          title: "Ошибка",
+          message: "Не удалось сохранить регионы",
+          type: "danger",
+        });
       } else {
-        notify({ title: "Успешно", message: "Регионы сохранены", type: "success" });
+        notify({
+          title: "Успешно",
+          message: "Регионы сохранены",
+          type: "success",
+        });
       }
     } catch {
-      notify({ title: "Ошибка", message: "Сетевая ошибка при сохранении", type: "danger" });
+      notify({
+        title: "Ошибка",
+        message: "Сетевая ошибка при сохранении",
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -117,7 +152,7 @@ export default function Regions({ refreshToken }) {
       <h2 className="text-3xl font-medium">Выбор регионов</h2>
 
       {regions ? (
-        <ul className="flex flex-col gap-[10px]">
+        <ul className="flex flex-col flex-wrap gap-[10px] max-h-[350px]">
           {regions.map(({ code, name }) => (
             <li key={code}>
               <Text as="label" size="5" style={{ cursor: "pointer" }}>
@@ -131,7 +166,6 @@ export default function Regions({ refreshToken }) {
                     radius="full"
                     checked={userRegions.includes(code)}
                     onCheckedChange={() => toggleRegion(code)}
-                    
                   />
                   {name}
                 </Flex>
@@ -143,6 +177,39 @@ export default function Regions({ refreshToken }) {
         <Loader isFull={false} color="var(--main)" />
       )}
 
+      <div className="flex flex-col gap-3 ">
+        <p className="text-2xl"> Совсем скоро будем работать с:</p>
+        <div className="overflow-auto">
+          <ul className="flex flex-col flex-wrap gap-[10px] w-full max-h-[300px] min-w-[400px] ">
+            {regionsPrev.map((item, index) => (
+              <li key={index}>
+                <Text as="label" size="5" style={{ cursor: "pointer" }}>
+                  <Flex
+                    align="center"
+                    gap="4"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      notify({
+                        title: "Ошибка",
+                        message:
+                          "Функционал еще не доступен, но будет доступен очень скоро!",
+                        type: "warning",
+                      });
+                    }}
+                  >
+                    <Switch
+                      radius="full"
+                      checked={userRegions.includes(item)}
+                      // onCheckedChange={() => toggleRegion(code)}
+                    />
+                    {item}
+                  </Flex>
+                </Text>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
       <button
         onClick={handleSave}
         disabled={loading}

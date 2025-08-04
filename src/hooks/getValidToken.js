@@ -25,12 +25,12 @@ export function useValidToken() {
 
       // console.log(data)
       setCookie("auth_token", data.access_token, {
-        path: "/",
+        path: "regius_tenders/",
         maxAge: 3600,
       });
 
       setCookie("refresh_token", data.refresh_token, {
-        path: "/",
+        path: "regius_tenders/",
         maxAge: 86400,
       });
 

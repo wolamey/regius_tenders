@@ -367,7 +367,7 @@ export default function Home({ refreshToken }) {
           refreshToken={refreshToken}
         />
       )}
-      <div className={`sticky top-0 z-9 bg-[var(--bg)] flex items-start 	px-[20px] sm:px-[40px] py-[20px] gap-4  ${screenWidth >= 1440 ? 'flex-col': 'sm:flex-row flex-col'}`}>
+      <div className={`sticky top-0 z-9 bg-[var(--bg)] flex items-start 	px-[20px] sm:px-[40px] pb-[20px] gap-4  ${screenWidth >= 1440 ? 'flex-col': 'sm:flex-row flex-col'}`}>
         {screenWidth >= 1440 && (
           <div className="w-full">
             <div

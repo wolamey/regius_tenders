@@ -4,7 +4,7 @@ import ErrorPopup from "../ErrorPopup/ErrorPopup";
 import { useCookies } from "react-cookie";
 import useUserInfo from "../../hooks/useUserInfo";
 import DayNightToggler from "../Sidebar/Components/DayNightToggler/DayNightToggler";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function UserInfoLine({
   isSideBarHidden,
@@ -15,6 +15,7 @@ export default function UserInfoLine({
   const { userInfo, error, setError } = useUserInfo(refreshToken);
   if (error) setError(error);
   const [isActive, setIsActive] = useState(false);
+  const location = useLocation();
 
   const path = location.pathname;
 

@@ -17,11 +17,7 @@
 }
 
 body {
-  --bg: #ddedd1;
-  --bg2: #f6fcf2;
   --bg-modal:var(--main);
-  --main: #646d5c;
-  --second: #d2e3c8;
 
   --input: white;
 
@@ -74,6 +70,27 @@ body.purple.dark  {
   --main: #8B58F5;
   --lots: #3e2372;
   --second: rgba(255, 255, 255, 0.115);
+
+}
+
+
+
+body.blue {
+  --bg: #f0f6fb;
+  --bg2: #fff;
+  --main: #407CD2;
+  --lots: #e1eefe;
+  --second: #eaf1fa;
+
+}
+
+
+body.blue.dark  {
+  --bg: #141b25;
+  --bg2: #26364b;
+  --main: #407CD2;
+  --lots: #1f2f43;
+  --second: #407CD2;
 
 }
 
