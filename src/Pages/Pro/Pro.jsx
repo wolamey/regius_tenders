@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import proYear from "../../assets/images/pro_year.png";
 
@@ -8,7 +8,42 @@ import proHalf from "../../assets/images/pro_half.png";
 import Present from "../../assets/images/present.svg?react";
 
 import "./Pro.scss";
+import { tryProtectedRequest } from "../../utils/tryProtectedRequest";
+import { useLogout } from "../../hooks/useLogout";
+import { notify } from "../../utils/notify";
 export default function Pro({ refreshToken }) {
+  const images = [proMonth,  proHalf, proYear];
+
+  const logout = useLogout();
+  const [tarifs, setTarifs] = useState(null);
+
+  const getTarifs = async () => {
+    try {
+      const { data, response } = await tryProtectedRequest({
+        url: `https://tendersiteapi.dev.regiuslab.by/v1/util/subscription-plans`,
+        method: "GET",
+        refreshToken,
+        logout,
+      });
+
+      if (!response.ok) {
+        notify({ title: "Ошибка", message: data.detail, type: "danger" });
+        return;
+      }
+
+      setTarifs(data.plans);
+      console.log(data.plans);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      // setError(msg);
+      notify({ title: "Ошибка", message: msg, type: "danger" });
+    }
+  };
+
+  useEffect(() => {
+    getTarifs();
+  }, []);
+
   return (
     <div className="flex flex-col gap-20">
       <div className="flex flex-col justify-center items-center gap-4 pt-10 max-w-[90%] m-auto ">
@@ -63,8 +98,60 @@ export default function Pro({ refreshToken }) {
           </p>
         </div>
       </div>
+      <div className="md:grid  md:grid-cols-3 flex flex-col gap-10 md:gap-5 max-w-[800px] m-auto w-full">
+        {tarifs &&
+          tarifs.map((item, index) => (
+            <div className="cardP m-auto" key={index}>
+              <div className="cardP__shine"></div>
+              <div className="cardP__glow"></div>
+              <div className="cardP__content ">
+                <div className="cardP__badge">{item.hint}</div>
+                <div className="cardP__image">
+                  <img src={images[index]} alt="" />
+                </div>
+                <div className="cardP__text">
+                  <p className="cardP__title">{item.name}</p>
 
-      <div className="sm:grid  sm:grid-cols-3 flex flex-col gap-10 sm:gap-5 max-w-[800px] m-auto w-full">
+                  {item.gift_text && (
+                    <div className="flex gap-2 text-[var(--main)] items-center">
+                      <Present />
+                      <p className="cardP__description leading-3">
+                        {item.gift_text}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2  items-center">
+                    {item.description && (
+                      <p className="cardP__description leading-3">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="cardP__footer">
+                  <div className="flex flex-col">
+                    <div className="cardP__price">{item.discounted_price} BYN</div>
+                    <div className=" text-xs opacity-50 line-through leading-1">
+                      {item.price} BYN
+                    </div>
+                  </div>
+                  <div className="cardP__button">
+                    <svg height="16" width="16" viewBox="0 0 24 24">
+                      <path
+                        stroke-width="2"
+                        stroke="currentColor"
+                        d="M4 12H20M12 4V20"
+                        fill="currentColor"
+                      ></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+      </div>
+      {/* <div className="sm:grid  sm:grid-cols-3 flex flex-col gap-10 sm:gap-5 max-w-[800px] m-auto w-full">
         <div className="cardP m-auto">
           <div className="cardP__shine"></div>
           <div className="cardP__glow"></div>
@@ -78,7 +165,7 @@ export default function Pro({ refreshToken }) {
 
               <div className="flex gap-2  items-center">
                 <p className="cardP__description leading-3">
-                 Для тех кто хочет попробовать
+                  Для тех кто хочет попробовать
                 </p>
               </div>
             </div>
@@ -108,15 +195,20 @@ export default function Pro({ refreshToken }) {
             </div>
             <div className="cardP__text">
               <p className="cardP__title">1 год</p>
-                   <div className="flex gap-2 text-[var(--main)] items-center">
+              <div className="flex gap-2 text-[var(--main)] items-center">
                 <Present />
                 <p className="cardP__description leading-3">
-               -15% 2 или месяца бесплатно
+                  -15% 2 или месяца бесплатно
                 </p>
               </div>
             </div>
             <div className="cardP__footer">
-              <div className="cardP__price">1530 BYN</div>
+              <div className="flex flex-col">
+                <div className="cardP__price">1530 BYN</div>
+                <div className=" text-xs opacity-50 line-through leading-1">
+                  1800 BYN
+                </div>
+              </div>
               <div className="cardP__button">
                 <svg height="16" width="16" viewBox="0 0 24 24">
                   <path
@@ -141,16 +233,20 @@ export default function Pro({ refreshToken }) {
             </div>
             <div className="cardP__text">
               <p className="cardP__title">6 месяцев</p>
-                <div className="flex gap-2 text-[var(--main)] items-center">
+              <div className="flex gap-2 text-[var(--main)] items-center">
                 <Present />
                 <p className="cardP__description leading-3">
-               
-                      -10% или 2 недели бесплатно
+                  -10% или 2 недели бесплатно
                 </p>
               </div>
             </div>
             <div className="cardP__footer">
-              <div className="cardP__price">810 BYN</div>
+              <div className="flex flex-col">
+                <div className="cardP__price">810 BYN</div>
+                <div className=" text-xs opacity-50 line-through leading-1">
+                  900 BYN
+                </div>
+              </div>
               <div className="cardP__button">
                 <svg height="16" width="16" viewBox="0 0 24 24">
                   <path
@@ -164,7 +260,7 @@ export default function Pro({ refreshToken }) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

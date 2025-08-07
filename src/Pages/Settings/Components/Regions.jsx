@@ -152,7 +152,7 @@ export default function Regions({ refreshToken }) {
       <h2 className="text-3xl font-medium">Выбор регионов</h2>
 
       {regions ? (
-        <ul className="flex flex-col flex-wrap gap-[10px] max-h-[350px]">
+        <ul className="!cursor-pointer flex flex-col flex-wrap gap-[10px] max-h-[350px]">
           {regions.map(({ code, name }) => (
             <li key={code}>
               <Text as="label" size="5" style={{ cursor: "pointer" }}>
@@ -166,6 +166,7 @@ export default function Regions({ refreshToken }) {
                     radius="full"
                     checked={userRegions.includes(code)}
                     onCheckedChange={() => toggleRegion(code)}
+                    style={{ cursor: "pointer" }}
                   />
                   {name}
                 </Flex>
@@ -176,7 +177,14 @@ export default function Regions({ refreshToken }) {
       ) : (
         <Loader isFull={false} color="var(--main)" />
       )}
-
+      <button
+        onClick={handleSave}
+        disabled={loading}
+        className="p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
+    bg-[var(--main)]/90 cursor-pointer hover:bg-[var(--main)] mt-[10px]"
+      >
+        {loading ? "Сохранение..." : "Сохранить"}
+      </button>
       <div className="flex flex-col gap-3 ">
         <p className="text-2xl"> Совсем скоро будем работать с:</p>
         <div className="overflow-auto">
@@ -210,14 +218,6 @@ export default function Regions({ refreshToken }) {
           </ul>
         </div>
       </div>
-      <button
-        onClick={handleSave}
-        disabled={loading}
-        className="p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
-    bg-[var(--main)]/90 cursor-pointer hover:bg-[var(--main)] mt-[10px]"
-      >
-        {loading ? "Сохранение..." : "Сохранить"}
-      </button>
     </div>
   );
 }

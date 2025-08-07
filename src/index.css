@@ -99,6 +99,9 @@ body.blue.dark  {
 
 }
 
+.rt-SwitchRoot{
+  cursor: pointer !important;
+}
 
 .rt-SwitchRoot:where(.rt-variant-surface)::before{
   background-image: linear-gradient(to right, var(--main) 40%, transparent 60%);

@@ -3,10 +3,9 @@
   --cardP-accent: var(--main);
   --cardP-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
 
-
   cursor: pointer;
   width: 190px;
-  height: 254px;
+  // height: 254px;
   background: var(--cardP-bg);
   border-radius: 20px;
   position: relative;
@@ -15,6 +14,16 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, sans-serif;
+
+  &:nth-child(2) {
+    scale: 1.2;
+
+    transform: translateX(-20px);
+  }
+
+  &:nth-child(3) {
+    scale: 1.4;
+  }
 }
 
 .cardP__shine {
@@ -66,13 +75,14 @@
 .cardP__image {
   width: 100%;
   height: 100px;
+  min-height: 100px;
   background: linear-gradient(45deg, var(--lots), var(--main));
   border-radius: 12px;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
 
-  img{
+  img {
     height: 100%;
     margin: auto;
   }
@@ -113,7 +123,6 @@
 .cardP__description {
   font-size: 0.75em;
   margin: 0;
-  opacity: 0.7;
   transition: all 0.3s ease;
 }
 
@@ -147,10 +156,13 @@
 /* Hover Effects */
 .cardP:hover {
   transform: translateY(-10px);
-//   box-shadow:
-//     0 20px 25px -5px rgba(0, 0, 0, 0.1),
-//     0 10px 10px -5px rgba(0, 0, 0, 0.04);
-//   border-color: rgba(124, 58, 237, 0.2);
+  //   box-shadow:
+  //     0 20px 25px -5px rgba(0, 0, 0, 0.1),
+  //     0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  //   border-color: rgba(124, 58, 237, 0.2);
+}
+.cardP:nth-child(2):hover {
+  transform: translateX(-20px) translateY(-10px);
 }
 
 .cardP:hover .cardP__shine {
@@ -170,7 +182,7 @@
 
 .cardP:hover .cardP__image {
   transform: translateY(-5px) scale(1.03);
-//   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  //   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .cardP:hover .cardP__title {
@@ -221,5 +233,18 @@
   }
   100% {
     transform: scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .cardP {
+    scale: 1 !important;
+    transform: translate(0, 0);
+  }
+  .cardP:nth-child(2) {
+    transform: translate(0, 0);
+    &:hover {
+      transform: translateY(-10px);
+    }
   }
 }

@@ -43,6 +43,8 @@ export default function Home({ refreshToken }) {
 
   const [statusesToggler, setStatusesToggler] = useState(false);
 
+  const [isSubscribed, setIsSubscribed] = useState(true);
+
   const fieldsToSearch = ["tender_number", "name", "customer_name"];
   const search = inputValue.toLowerCase();
 
@@ -93,8 +95,10 @@ export default function Home({ refreshToken }) {
 
       if (!response.ok) {
         notify({ title: "Ошибка", message: data.detail, type: "danger" });
+        setIsSubscribed(false);
         return;
       }
+      setIsSubscribed(true);
 
       setTenders(data.tenders);
       setTotalPages(data.total_pages);
@@ -367,7 +371,18 @@ export default function Home({ refreshToken }) {
           refreshToken={refreshToken}
         />
       )}
-      <div className={`sticky top-0 z-9 bg-[var(--bg)] flex items-start 	px-[20px] sm:px-[40px] pb-[20px] gap-4  ${screenWidth >= 1440 ? 'flex-col': 'sm:flex-row flex-col'}`}>
+
+
+{!isSubscribed ? (
+   <p className="text-[24px] text-center">
+            Ваш аккаунт еще не активирован или у Вы не оплатили подписку.
+          </p>
+) : (
+      <div
+        className={`sticky top-0 z-9 bg-[var(--bg)] flex items-start 	px-[20px] sm:px-[40px] pb-[20px] gap-4  ${
+          screenWidth >= 1440 ? "flex-col" : "sm:flex-row flex-col"
+        }`}
+      >
         {screenWidth >= 1440 && (
           <div className="w-full">
             <div
@@ -392,8 +407,6 @@ bg-[var(--clean)]/20 hover:bg-[var(--clean)]/50   ${
                   </div>
 
                   <ul className="flex gap-[10px] flex-wrap">
-        
-
                     {userStatustes ? (
                       Object.entries(userStatustes).map(([key, value]) => (
                         <li
@@ -472,7 +485,6 @@ bg-[var(--clean)]/20 hover:bg-[var(--clean)]/50  ${
                 </div>
               </div>
             </div>
-      
           </div>
         )}
 
@@ -673,13 +685,17 @@ bg-[var(--clean)]/20 hover:bg-[var(--clean)]/50  ${
           </div>
         )}
       </div>
+) }
+
+
+
 
       <div className="flex flex-col gap-[30px] p-[20px] ">
         {tendersLoader ? (
           <div className="m-auto">
             <Loader isFull={false} color="var(--main)" />
           </div>
-        ) : filteredTenders.length === 0 ? (
+        )  : filteredTenders.length === 0 ? (
           <p className="text-[24px] text-center">
             К сожалению, по данным фильтрам тендера не найдены :(
           </p>
