@@ -17,22 +17,13 @@ export default function Regions({ refreshToken }) {
     "Казахстан",
     "Грузия",
     "Азербайджан",
-    "Литва",
-    "Латвия",
-    "Польша",
     "Узбекистан",
     "Кыргызстан",
     "Молдова",
-    "Румыния",
-    "США",
-    "Германия",
-    "Франция",
-    "Италия",
-    "Испания",
     "Турция",
   ]);
 
-  // 1. Получить все регионы
+
   const getRegions = async () => {
     try {
       const res = await fetch(
@@ -46,7 +37,6 @@ export default function Regions({ refreshToken }) {
       const data = await res.json();
       if (res.ok) {
         setRegions(data.regions);
-        // после загрузки регионов — подгружаем сохранённые регионы пользователя
         getUserProfile(data.regions);
       }
     } catch (err) {
@@ -54,7 +44,6 @@ export default function Regions({ refreshToken }) {
     }
   };
 
-  // 2. Получаем выбранные регионы из профиля
   const getUserProfile = async (allRegions) => {
     try {
       const { data, response } = await tryProtectedRequest({
@@ -67,15 +56,12 @@ export default function Regions({ refreshToken }) {
       if (response.ok) {
         const saved = data.selected_regions || [];
         if (saved.length) {
-          // выставляем только те коды, что пришли из профиля
           setUserRegions(saved.map((r) => r.code));
           return;
         }
       }
-      // если запрос не ок или ничего не пришло — включаем все коды
       setUserRegions(allRegions.map((r) => r.code));
     } catch {
-      // в случае сетевой ошибки тоже включаем все
       setUserRegions(allRegions.map((r) => r.code));
     }
   };
@@ -84,7 +70,6 @@ export default function Regions({ refreshToken }) {
     getRegions();
   }, []);
 
-  // 3. Переключение одного региона с защитой от снятия всех
   const toggleRegion = (code) => {
     if (userRegions.length === 1 && userRegions[0] === code) {
       setUserRegions([]);
@@ -103,7 +88,6 @@ export default function Regions({ refreshToken }) {
     );
   };
 
-  // 4. Сохранение через PATCH
   const handleSave = async () => {
     if (!regions) return;
     setLoading(true);

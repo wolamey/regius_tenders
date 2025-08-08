@@ -11,12 +11,26 @@ import "./Pro.scss";
 import { tryProtectedRequest } from "../../utils/tryProtectedRequest";
 import { useLogout } from "../../hooks/useLogout";
 import { notify } from "../../utils/notify";
+import { formatNumberWithSpaces } from "../../utils/formatNumberWithSpaces";
+import useUserInfo from "../../hooks/useUserInfo";
+import Loader from "../../Components/Loader/Loader";
+import { useCookies } from "react-cookie";
 export default function Pro({ refreshToken }) {
-  const images = [proMonth,  proHalf, proYear];
+  const images = [proMonth, proHalf, proYear];
+  const { userInfo, error, setError } = useUserInfo(refreshToken);
+  const [currentUser, setCurrentUser] = useState();
 
+  const [waitingPhrase, setWaitingPhrase] = useState("");
+  const [waiting, setWaiting] = useState(false);
+  const [bill, setBill] = useState(null);
+  const [cookies, setCookie, removeCookie] = useCookies([
+    "auth_token",
+    "theme",
+    "isDark",
+  ]);
   const logout = useLogout();
   const [tarifs, setTarifs] = useState(null);
-
+  const [pdfUrl, setPdfUrl] = useState(null);
   const getTarifs = async () => {
     try {
       const { data, response } = await tryProtectedRequest({
@@ -44,8 +58,194 @@ export default function Pro({ refreshToken }) {
     getTarifs();
   }, []);
 
+  const createInvoice = async (subscriptionplanid) => {
+    setWaitingPhrase(
+      "Ожидайте, создаем для Вас счет для оплаты. Это займет не более минуты :)"
+    );
+
+    setWaiting(true);
+
+    try {
+      const sendData = {
+        site_user_id: userInfo.id,
+        subscription_plan_id: subscriptionplanid,
+      };
+      const { data, response } = await tryProtectedRequest({
+        url: `https://tendersiteapi.dev.regiuslab.by/v1/invoices/create`,
+        method: "POST",
+        body: sendData,
+        token: cookies.auth_token,
+        refreshToken,
+        logout,
+      });
+
+      if (!response.ok) {
+        notify({ title: "Ошибка", message: data.detail, type: "danger" });
+        return;
+      }
+      setBill(data.invoice_id);
+
+      console.log(data.invoice_id);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      // setError(msg);
+      notify({ title: "Ошибка", message: msg, type: "danger" });
+    }
+  };
+
+  const viewInvoice = async () => {
+    if (!bill) {
+      console.log("!bill");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://tendersiteapi.dev.regiuslab.by/v1/invoices/view/${bill}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies.auth_token}`,
+            Accept: "application/pdf",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        // Попробуем прочитать текст ошибки, если это не PDF
+        const errorText = await response.text();
+        notify({
+          title: "Ошибка",
+          message: errorText || "Не удалось получить счет",
+          type: "danger",
+        });
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+
+      notify({
+        title: "Успешно",
+        message: "Счет успешно получен",
+        type: "success",
+      });
+
+      setWaitingPhrase("");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      notify({ title: "Ошибка2", message: msg, type: "danger" });
+    }
+  };
+
+  useEffect(() => {
+    if (bill) {
+      viewInvoice();
+    }
+  }, [bill]);
+
+  const downloadInvoice = async () => {
+    if (!bill) {
+      notify({ title: "Ошибка", message: "Счет не найден", type: "danger" });
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://tendersiteapi.dev.regiuslab.by/v1/invoices/download/${bill}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${cookies.auth_token}`,
+            Accept: "application/pdf",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        notify({
+          title: "Ошибка",
+          message: errorText || "Не удалось скачать счет",
+          type: "danger",
+        });
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      // Получаем имя файла из заголовка, если нужно
+      const contentDisposition = response.headers.get("content-disposition");
+      const filenameMatch = contentDisposition?.match(/filename="?(.+)"?/);
+      const filename = filenameMatch?.[1] || `invoice_${bill}.pdf`;
+
+      // Создаем ссылку и инициируем скачивание
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      notify({
+        title: "Успешно",
+        message: "Счет скачан",
+        type: "success",
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      notify({ title: "Ошибка", message: msg, type: "danger" });
+    }
+  };
+
   return (
     <div className="flex flex-col gap-20">
+      {waiting && (
+        <div className="flex flex-col gap-3 absolute justify-center items-center top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--bg-modal)]/50 z-999 h-screen ">
+          {waitingPhrase && (
+            <div className="flex flex-col gap-3 items-center">
+              <p className="text-white">{waitingPhrase}</p>
+              <div className="opacity-70">
+                <Loader isFull={false} color="white" />
+              </div>
+            </div>
+          )}
+
+          {pdfUrl && (
+            <div className="">
+              <iframe
+                src={pdfUrl}
+                title="Invoice PDF"
+                className="w-[90vh] h-[80vh]"
+              />
+              <div className="flex w-fit m-auto gap-5">
+                <button
+                  className={`block p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
+    bg-[var(--main)]/90 cursor-pointer hover:bg-[var(--main)] mt-[10px] m-auto`}
+                  onClick={() => {
+                    downloadInvoice();
+                  }}
+                >
+                  Скачать счет
+                </button>
+                <button
+                  className={`block p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
+    bg-[var(--main)]/20 cursor-pointer hover:bg-[var(--main)] mt-[10px] m-auto`}
+                  onClick={() => {
+                    setWaiting(null);
+                    setPdfUrl(null)
+                  }}
+                >
+                  Закрыть
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="flex flex-col justify-center items-center gap-4 pt-10 max-w-[90%] m-auto ">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -99,7 +299,7 @@ export default function Pro({ refreshToken }) {
         </div>
       </div>
       <div className="md:grid  md:grid-cols-3 flex flex-col gap-10 md:gap-5 max-w-[800px] m-auto w-full">
-        {tarifs &&
+        {tarifs ? (
           tarifs.map((item, index) => (
             <div className="cardP m-auto" key={index}>
               <div className="cardP__shine"></div>
@@ -131,12 +331,20 @@ export default function Pro({ refreshToken }) {
                 </div>
                 <div className="cardP__footer">
                   <div className="flex flex-col">
-                    <div className="cardP__price">{item.discounted_price} BYN</div>
-                    <div className=" text-xs opacity-50 line-through leading-1">
-                      {item.price} BYN
+                    <div className="cardP__price">
+                      {formatNumberWithSpaces(item.discounted_price)} BYN
                     </div>
+
+                    {item.price !== 0 && (
+                      <div className=" text-xs opacity-50 line-through leading-1">
+                        {formatNumberWithSpaces(item.price)} BYN
+                      </div>
+                    )}
                   </div>
-                  <div className="cardP__button">
+                  <div
+                    onClick={() => createInvoice(item.id)}
+                    className="cardP__button"
+                  >
                     <svg height="16" width="16" viewBox="0 0 24 24">
                       <path
                         stroke-width="2"
@@ -149,118 +357,13 @@ export default function Pro({ refreshToken }) {
                 </div>
               </div>
             </div>
-          ))}
+          ))
+        ) : (
+          <div className=" col-span-3 w-fit  m-auto">
+            <Loader isFull={false} color="var(--main)" />
+          </div>
+        )}
       </div>
-      {/* <div className="sm:grid  sm:grid-cols-3 flex flex-col gap-10 sm:gap-5 max-w-[800px] m-auto w-full">
-        <div className="cardP m-auto">
-          <div className="cardP__shine"></div>
-          <div className="cardP__glow"></div>
-          <div className="cardP__content ">
-            <div className="cardP__badge">Самый дешевый</div>
-            <div className="cardP__image">
-              <img src={proMonth} alt="" />
-            </div>
-            <div className="cardP__text">
-              <p className="cardP__title">1 месяц</p>
-
-              <div className="flex gap-2  items-center">
-                <p className="cardP__description leading-3">
-                  Для тех кто хочет попробовать
-                </p>
-              </div>
-            </div>
-            <div className="cardP__footer">
-              <div className="cardP__price">150 BYN</div>
-              <div className="cardP__button">
-                <svg height="16" width="16" viewBox="0 0 24 24">
-                  <path
-                    stroke-width="2"
-                    stroke="currentColor"
-                    d="M4 12H20M12 4V20"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="cardP m-auto scale-120">
-          <div className="cardP__shine"></div>
-          <div className="cardP__glow"></div>
-          <div className="cardP__content">
-            <div className="cardP__badge">Самый выгодный</div>
-            <div className="cardP__image">
-              <img src={proYear} alt="" />
-            </div>
-            <div className="cardP__text">
-              <p className="cardP__title">1 год</p>
-              <div className="flex gap-2 text-[var(--main)] items-center">
-                <Present />
-                <p className="cardP__description leading-3">
-                  -15% 2 или месяца бесплатно
-                </p>
-              </div>
-            </div>
-            <div className="cardP__footer">
-              <div className="flex flex-col">
-                <div className="cardP__price">1530 BYN</div>
-                <div className=" text-xs opacity-50 line-through leading-1">
-                  1800 BYN
-                </div>
-              </div>
-              <div className="cardP__button">
-                <svg height="16" width="16" viewBox="0 0 24 24">
-                  <path
-                    stroke-width="2"
-                    stroke="currentColor"
-                    d="M4 12H20M12 4V20"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="cardP m-auto">
-          <div className="cardP__shine"></div>
-          <div className="cardP__glow"></div>
-          <div className="cardP__content">
-            <div className="cardP__badge">Идеальная середина</div>
-            <div className="cardP__image">
-              <img src={proHalf} alt="" />
-            </div>
-            <div className="cardP__text">
-              <p className="cardP__title">6 месяцев</p>
-              <div className="flex gap-2 text-[var(--main)] items-center">
-                <Present />
-                <p className="cardP__description leading-3">
-                  -10% или 2 недели бесплатно
-                </p>
-              </div>
-            </div>
-            <div className="cardP__footer">
-              <div className="flex flex-col">
-                <div className="cardP__price">810 BYN</div>
-                <div className=" text-xs opacity-50 line-through leading-1">
-                  900 BYN
-                </div>
-              </div>
-              <div className="cardP__button">
-                <svg height="16" width="16" viewBox="0 0 24 24">
-                  <path
-                    stroke-width="2"
-                    stroke="currentColor"
-                    d="M4 12H20M12 4V20"
-                    fill="currentColor"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 }

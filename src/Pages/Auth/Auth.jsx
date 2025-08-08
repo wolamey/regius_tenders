@@ -39,11 +39,11 @@ export default function Auth() {
       const data = await response.json();
       if (response.ok) {
         setCookie("auth_token", data.access_token, {
-          path: "regius_tenders/",
+          path: "/",
           maxAge: 3600,
         });
         setCookie("refresh_token", data.refresh_token, {
-          path: "regius_tenders/",
+          path: "/",
           maxAge: 86400,
         });
         navigate("/");
@@ -91,7 +91,7 @@ export default function Auth() {
   useEffect(() => {
     if (!cookies.theme)
       setCookie("theme", "blue", {
-        path: "regius_tenders/",
+        path: "/",
         expires: new Date("2099-12-31"),
       });
   });
@@ -189,6 +189,12 @@ export default function Auth() {
           </Link>
         </form>
       </div>
+         <Link
+        className="absolute bottom-0 hover:text-[var(--main)] left-0 rounded-lg text-xs opacity-75 px-2 py-0.5 bg-[var(--bg)]"
+        to="privacy"
+      >
+        Политика конфиденциальности
+      </Link>
     </div>
   );
 }

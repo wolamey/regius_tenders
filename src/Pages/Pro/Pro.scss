@@ -200,13 +200,13 @@
   transform: translateX(2px);
 }
 
-.cardP:hover .cardP__button {
+ .cardP__button:hover {
   transform: scale(1);
-  // box-shadow: 0 0 0 4px var(--main);
+  box-shadow: 0 0 0 2px var(--main);
 }
 
-.cardP:hover .cardP__button svg {
-  // animation: pulse 1.5s infinite;
+ .cardP__button:hover svg {
+  animation: pulse 1.5s infinite;
 }
 
 /* Active State */

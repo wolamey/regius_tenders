@@ -12,7 +12,7 @@ export default function ThemeToggler({ isDark }) {
 
   const handleChangeTheme = (theme) => {
     setCookie("theme", theme, {
-      path: "regius_tenders/",
+      path: "/",
       expires: new Date("2099-12-31"),
     });
   };
@@ -33,7 +33,7 @@ export default function ThemeToggler({ isDark }) {
 
 
 useEffect(() => {
-  console.log(isDark)
+  // console.log(isDark)
   setThemes([
     {
       name: "green",
@@ -65,7 +65,7 @@ useEffect(() => {
   useEffect(() => {
     if (!cookie.theme)
       setCookie("theme", "blue", {
-        path: "regius_tenders/",
+        path: "/",
         expires: new Date("2099-12-31"),
       })
   },[]);

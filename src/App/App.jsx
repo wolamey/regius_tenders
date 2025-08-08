@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, Link } from "react-router-dom";
 import { CookiesProvider, useCookies } from "react-cookie";
 import { ReactNotifications } from "react-notifications-component";
 
@@ -10,6 +10,7 @@ import Home from "../Pages/Home/Home";
 import Settings from "../Pages/Settings/Settings";
 import RequireAuth from "../Components/RequireAuth/RequireAuth";
 import Pro from "../Pages/Pro/Pro";
+import Privacy from "../Pages/Privacy/Privacy";
 
 // Компонент для подгрузки Bitrix24-чата
 const BitrixScript = () => {
@@ -37,9 +38,12 @@ const BitrixScript = () => {
   return null;
 };
 
-
 const App = () => {
-  const [cookies, setCookie] = useCookies(["auth_token", "refresh_token", 'theme']);
+  const [cookies, setCookie] = useCookies([
+    "auth_token",
+    "refresh_token",
+    "theme",
+  ]);
 
   // Функция для обновления токена
   const refreshToken = async () => {
@@ -60,11 +64,11 @@ const App = () => {
       if (!data) return null;
 
       setCookie("auth_token", data.access_token, {
-        path: "regius_tenders/",
+        path: "/",
         maxAge: 3600,
       });
       setCookie("refresh_token", data.refresh_token, {
-        path: "regius_tenders/",
+        path: "/",
         maxAge: 86400,
       });
       // alert("refreshed");
@@ -76,24 +80,21 @@ const App = () => {
   };
   const bodyTag = document.querySelector("body");
 
-    useEffect(() => {
-      if (!cookies.theme){
-        setCookie("theme", "blue", {
-          path: "regius_tenders/",
-          expires: new Date("2099-12-31"),
-        })}
-         else 
-    bodyTag.classList.add(cookies.theme);
-       
-        
-    },[]);
+  useEffect(() => {
+    if (!cookies.theme) {
+      setCookie("theme", "blue", {
+        path: "/",
+        expires: new Date("2099-12-31"),
+      });
+    } else bodyTag.classList.add(cookies.theme);
+  }, []);
   return (
     <div className="app">
-
       <Routes>
         {/* Публичные страницы */}
         <Route path="/auth" element={<Auth />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/privacy" element={<Privacy />} />
 
         {/* Защищённые маршруты — только для авторизованных */}
         <Route element={<RequireAuth />}>
@@ -120,17 +121,21 @@ const App = () => {
             }
           />
 
-
-          <Route path="/pro" element={
-                <>
+          <Route
+            path="/pro"
+            element={
+              <>
                 <BitrixScript />
                 <Layout refreshToken={refreshToken} pageName="PRO">
                   <Pro refreshToken={refreshToken} />
                 </Layout>
               </>
-          }/>
+            }
+          />
         </Route>
       </Routes>
+
+   
     </div>
   );
 };

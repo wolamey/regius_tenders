@@ -18,6 +18,7 @@ import { Store } from "react-notifications-component";
 import { notify } from "../../utils/notify";
 import { tryProtectedRequest } from "../../utils/tryProtectedRequest";
 import { Highlight } from "./Components/Highlight";
+import { formatNumberWithSpaces } from "../../utils/formatNumberWithSpaces";
 export default function Home({ refreshToken }) {
   const [error, setError] = useState("");
   const [cookies, setCookie, removeCookie] = useCookies([
@@ -372,332 +373,363 @@ export default function Home({ refreshToken }) {
         />
       )}
 
+      {!isSubscribed ? (
+        <p className="text-[24px] text-center w-[90%] m-auto">
+          Вы не оплатили подписку. Для продолжения пользованием платформы
+          необходимо купить план.
+        </p>
+      ) : (
+        <div
+          className={`sticky top-0 z-9 bg-[var(--bg)] flex items-start 	px-[20px] sm:px-[40px] pb-[20px] gap-4  ${
+            screenWidth >= 1440 ? "flex-col" : "sm:flex-row flex-col"
+          }`}
+        >
+          {screenWidth >= 1440 && (
+            <div className="w-full">
+              <div
+                className={`overflow-hidden    gap-[20px] sm:px-[20px]   w-full  `}
+              >
+                <div className="grid  grid-cols-2  w-full gap-[20px] filters">
+                  <div className="flex flex-col gap-[20px]">
+                    <div className="flex gap-[5px_20px] items-center ">
+                      <p className="whitespace-nowrap">
+                        Пользовательский статус
+                      </p>
 
-{!isSubscribed ? (
-   <p className="text-[24px] text-center">
-            Ваш аккаунт еще не активирован или у Вы не оплатили подписку.
-          </p>
-) : (
-      <div
-        className={`sticky top-0 z-9 bg-[var(--bg)] flex items-start 	px-[20px] sm:px-[40px] pb-[20px] gap-4  ${
-          screenWidth >= 1440 ? "flex-col" : "sm:flex-row flex-col"
-        }`}
-      >
-        {screenWidth >= 1440 && (
-          <div className="w-full">
-            <div
-              className={`overflow-hidden    gap-[20px] sm:px-[20px]   w-full  `}
-            >
-              <div className="grid  grid-cols-2  w-full gap-[20px] filters">
-                <div className="flex flex-col gap-[20px]">
-                  <div className="flex gap-[5px_20px] items-center ">
-                    <p className="whitespace-nowrap">Пользовательский статус</p>
-
-                    <button
-                      className={`p-[10px] text-[14px] rounded-lg leading-1   border-2 border-[#B05959]
+                      <button
+                        className={`p-[10px] text-[14px] rounded-lg leading-1   border-2 border-[#B05959]
 bg-[var(--clean)]/20 hover:bg-[var(--clean)]/50   ${
-                        filters.status === ""
-                          ? "opacity-0 pointer-events-none"
-                          : " opacity-100"
-                      }`}
-                      onClick={() => earaseFilters("status")}
-                    >
-                      очистить
-                    </button>
+                          filters.status === ""
+                            ? "opacity-0 pointer-events-none"
+                            : " opacity-100"
+                        }`}
+                        onClick={() => earaseFilters("status")}
+                      >
+                        очистить
+                      </button>
+                    </div>
+
+                    <ul className="flex gap-[10px] flex-wrap">
+                      {userStatustes ? (
+                        Object.entries(userStatustes).map(([key, value]) => (
+                          <li
+                            onClick={() => {
+                              setFilters((prev) => {
+                                const updated = {
+                                  ...prev,
+                                  status: filters.status === key ? "" : key,
+                                };
+                                // console.log(updated);
+                                return updated;
+                              });
+                            }}
+                            className={`${
+                              filters.status === key
+                                ? "bg-[var(--filters)]"
+                                : "bg-[var(--main)]/10 hover:bg-[var(--filters)]/60"
+                            } border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item`}
+                            key={key}
+                            value={key}
+                          >
+                            {value}
+                          </li>
+                        ))
+                      ) : (
+                        <Loader isFull={false} />
+                      )}
+                    </ul>
                   </div>
+                  <div className="flex flex-col gap-[20px] ">
+                    <div className="flex gap-[5px_20px] items-center flex-wrap">
+                      <p className="whitespace-nowrap">Статус платформы</p>
 
-                  <ul className="flex gap-[10px] flex-wrap">
-                    {userStatustes ? (
-                      Object.entries(userStatustes).map(([key, value]) => (
-                        <li
-                          onClick={() => {
-                            setFilters((prev) => {
-                              const updated = {
-                                ...prev,
-                                status: filters.status === key ? "" : key,
-                              };
-                              // console.log(updated);
-                              return updated;
-                            });
-                          }}
-                          className={`${
-                            filters.status === key
-                              ? "bg-[var(--filters)]"
-                              : "bg-[var(--main)]/10 hover:bg-[var(--filters)]/60"
-                          } border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item`}
-                          key={key}
-                          value={key}
-                        >
-                          {value}
-                        </li>
-                      ))
-                    ) : (
-                      <Loader isFull={false} />
-                    )}
-                  </ul>
-                </div>
-                <div className="flex flex-col gap-[20px] ">
-                  <div className="flex gap-[5px_20px] items-center flex-wrap">
-                    <p className="whitespace-nowrap">Статус платформы</p>
-
-                    <button
-                      className={`p-[10px] text-[14px] rounded-lg leading-1   border-2 border-[#B05959]
+                      <button
+                        className={`p-[10px] text-[14px] rounded-lg leading-1   border-2 border-[#B05959]
 bg-[var(--clean)]/20 hover:bg-[var(--clean)]/50  ${
-                        filters.platform === ""
-                          ? "opacity-0 pointer-events-none"
-                          : " opacity-100"
-                      }`}
-                      onClick={() => earaseFilters("platform")}
-                    >
-                      очистить
-                    </button>
-                  </div>
+                          filters.platform === ""
+                            ? "opacity-0 pointer-events-none"
+                            : " opacity-100"
+                        }`}
+                        onClick={() => earaseFilters("platform")}
+                      >
+                        очистить
+                      </button>
+                    </div>
 
-                  <ul className="flex gap-[10px] flex-wrap">
-                    {platformStatustes ? (
-                      Object.entries(platformStatustes).map(([key, value]) => (
-                        <li
-                          onClick={() => {
-                            setFilters((prev) => {
-                              const updated = {
-                                ...prev,
-                                platform: key === filters.platform ? "" : key,
-                              };
-                              // console.log(updated);
-                              return updated;
-                            });
-                          }}
-                          className={`${
-                            filters.platform === key
-                              ? "bg-[var(--filters)]"
-                              : "bg-[var(--main)]/10 hover:bg-[var(--filters)]/60"
-                          } border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item `}
-                          key={key}
-                          value={key}
-                        >
-                          {value}
-                        </li>
-                      ))
-                    ) : (
-                      <Loader isFull={false} />
-                    )}
-                  </ul>
+                    <ul className="flex gap-[10px] flex-wrap">
+                      {platformStatustes ? (
+                        Object.entries(platformStatustes).map(
+                          ([key, value]) => (
+                            <li
+                              onClick={() => {
+                                setFilters((prev) => {
+                                  const updated = {
+                                    ...prev,
+                                    platform:
+                                      key === filters.platform ? "" : key,
+                                  };
+                                  // console.log(updated);
+                                  return updated;
+                                });
+                              }}
+                              className={`${
+                                filters.platform === key
+                                  ? "bg-[var(--filters)]"
+                                  : "bg-[var(--main)]/10 hover:bg-[var(--filters)]/60"
+                              } border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item `}
+                              key={key}
+                              value={key}
+                            >
+                              {value}
+                            </li>
+                          )
+                        )
+                      ) : (
+                        <Loader isFull={false} />
+                      )}
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <input
-          type="search"
-          className="bg-[var(--lots)] rounded-lg p-[10px_15px_10px_32px]  w-full search_input border-1 border-transparent focus-visible:border-[var(--main)]  focus-visible:bg-[transparent] "
-          placeholder="Поиск по названию тендера, заказчику или ID"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
-        {screenWidth < 1440 && (
-          <div className="">
-            <div
-              className={`overflow-hidden flex flex-col    gap-[20px] sm:px-[20px]   w-full  ${
-                isFiltersHidden ? "max-h-[0px] " : "max-h-[900px] pb-[20px] "
-              } `}
-            >
-              <div className="grid   gap-[20px] filters">
-                <div className="flex flex-col gap-[20px]">
-                  <div className="flex gap-[5px_20px] items-center ">
-                    <p className="whitespace-nowrap">Пользовательский статус</p>
+          <input
+            type="search"
+            className="bg-[var(--lots)] rounded-lg p-[10px_15px_10px_32px]  w-full search_input border-1 border-transparent focus-visible:border-[var(--main)]  focus-visible:bg-[transparent] "
+            placeholder="Поиск по названию тендера, заказчику или ID"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+          {screenWidth < 1440 && (
+            <div className="">
+              <div
+                className={`overflow-hidden flex flex-col    gap-[20px] sm:px-[20px]   w-full  ${
+                  isFiltersHidden ? "max-h-[0px] " : "max-h-[900px] pb-[20px] "
+                } `}
+              >
+                <div className="grid   gap-[20px] filters">
+                  <div className="flex flex-col gap-[20px]">
+                    <div className="flex gap-[5px_20px] items-center ">
+                      <p className="whitespace-nowrap">
+                        Пользовательский статус
+                      </p>
 
-                    <button
-                      className={`p-[10px] text-[14px] rounded-lg leading-1   border-2 border-[#B05959]
+                      <button
+                        className={`p-[10px] text-[14px] rounded-lg leading-1   border-2 border-[#B05959]
 bg-[var(--clean)]/20 hover:bg-[var(--clean)]/50   ${
-                        filters.status === ""
-                          ? "opacity-0 pointer-events-none"
-                          : " opacity-100"
-                      }`}
-                      onClick={() => earaseFilters("status")}
-                    >
-                      очистить
-                    </button>
-                  </div>
+                          filters.status === ""
+                            ? "opacity-0 pointer-events-none"
+                            : " opacity-100"
+                        }`}
+                        onClick={() => earaseFilters("status")}
+                      >
+                        очистить
+                      </button>
+                    </div>
 
-                  <ul className="flex gap-[10px] flex-wrap">
-                    {/* <li className="w-full border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap">
+                    <ul className="flex gap-[10px] flex-wrap">
+                      {/* <li className="w-full border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap">
 
   {filters.status === '' ? 'Не выбрано' : filters.status}
 
 </li> */}
 
-                    {userStatustes ? (
-                      Object.entries(userStatustes).map(([key, value]) => (
-                        <li
-                          onClick={() => {
-                            setFilters((prev) => {
-                              const updated = {
-                                ...prev,
-                                status: filters.status === key ? "" : key,
-                              };
-                              // console.log(updated);
-                              return updated;
-                            });
-                          }}
-                          className={`${
-                            filters.status === key
-                              ? "bg-[var(--filters)]"
-                              : "bg-[var(--main)]/10 hover:bg-[var(--filters)]/60"
-                          } border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item`}
-                          key={key}
-                          value={key}
-                        >
-                          {value}
-                        </li>
-                      ))
-                    ) : (
-                      <Loader isFull={false} />
-                    )}
-                  </ul>
-                </div>
-                <div className="flex flex-col gap-[20px] ">
-                  <div className="flex gap-[5px_20px] items-center flex-wrap">
-                    <p className="whitespace-nowrap">Статус платформы</p>
-
-                    <button
-                      className={`p-[10px] text-[14px] rounded-lg leading-1   border-2 border-[#B05959]
-bg-[var(--clean)]/20 hover:bg-[var(--clean)]/50  ${
-                        filters.platform === ""
-                          ? "opacity-0 pointer-events-none"
-                          : " opacity-100"
-                      }`}
-                      onClick={() => earaseFilters("platform")}
-                    >
-                      очистить
-                    </button>
+                      {userStatustes ? (
+                        Object.entries(userStatustes).map(([key, value]) => (
+                          <li
+                            onClick={() => {
+                              setFilters((prev) => {
+                                const updated = {
+                                  ...prev,
+                                  status: filters.status === key ? "" : key,
+                                };
+                                // console.log(updated);
+                                return updated;
+                              });
+                            }}
+                            className={`${
+                              filters.status === key
+                                ? "bg-[var(--filters)]"
+                                : "bg-[var(--main)]/10 hover:bg-[var(--filters)]/60"
+                            } border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item`}
+                            key={key}
+                            value={key}
+                          >
+                            {value}
+                          </li>
+                        ))
+                      ) : (
+                        <Loader isFull={false} />
+                      )}
+                    </ul>
                   </div>
+                  <div className="flex flex-col gap-[20px] ">
+                    <div className="flex gap-[5px_20px] items-center flex-wrap">
+                      <p className="whitespace-nowrap">Статус платформы</p>
 
-                  <ul className="flex gap-[10px] flex-wrap">
-                    {platformStatustes ? (
-                      Object.entries(platformStatustes).map(([key, value]) => (
-                        <li
-                          onClick={() => {
-                            setFilters((prev) => {
-                              const updated = {
-                                ...prev,
-                                platform: key === filters.platform ? "" : key,
-                              };
-                              // console.log(updated);
-                              return updated;
-                            });
-                          }}
-                          className={`${
-                            filters.platform === key
-                              ? "bg-[var(--filters)]"
-                              : "bg-[var(--main)]/10 hover:bg-[var(--filters)]/60"
-                          } border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item `}
-                          key={key}
-                          value={key}
-                        >
-                          {value}
-                        </li>
-                      ))
-                    ) : (
-                      <Loader isFull={false} />
-                    )}
-                  </ul>
+                      <button
+                        className={`p-[10px] text-[14px] rounded-lg leading-1   border-2 border-[#B05959]
+bg-[var(--clean)]/20 hover:bg-[var(--clean)]/50  ${
+                          filters.platform === ""
+                            ? "opacity-0 pointer-events-none"
+                            : " opacity-100"
+                        }`}
+                        onClick={() => earaseFilters("platform")}
+                      >
+                        очистить
+                      </button>
+                    </div>
+
+                    <ul className="flex gap-[10px] flex-wrap">
+                      {platformStatustes ? (
+                        Object.entries(platformStatustes).map(
+                          ([key, value]) => (
+                            <li
+                              onClick={() => {
+                                setFilters((prev) => {
+                                  const updated = {
+                                    ...prev,
+                                    platform:
+                                      key === filters.platform ? "" : key,
+                                  };
+                                  // console.log(updated);
+                                  return updated;
+                                });
+                              }}
+                              className={`${
+                                filters.platform === key
+                                  ? "bg-[var(--filters)]"
+                                  : "bg-[var(--main)]/10 hover:bg-[var(--filters)]/60"
+                              } border-2 border-[var(--main)] rounded-2xl p-[7px_15px] cursor-pointer whitespace-nowrap filter_item `}
+                              key={key}
+                              value={key}
+                            >
+                              {value}
+                            </li>
+                          )
+                        )
+                      ) : (
+                        <Loader isFull={false} />
+                      )}
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div
-              className="showFilters rounded-lg p-[10px_15px] cursor-pointer whitespace-nowrap w-[-webkit-fill-available] text-center bg-[var(--bg2)] flex gap-[5px] justify-center items-center "
-              onClick={() => setIsFiltersHidden(!isFiltersHidden)}
-            >
-              <p className="text-[var(--color)]">Фильтры</p>
-              {isFiltersHidden ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="12"
-                  viewBox="0 0 14 12"
-                  fill="none"
-                >
-                  <g clip-path="url(#clip0_90_8)">
-                    <path
-                      d="M11.582 6.26953L6.99906 10.5L2.41609 6.26953"
-                      stroke="var(--color)"
-                      strokeWidth="1.4"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M7 10.5L7 1.5"
-                      stroke="var(--color)"
-                      strokeWidth="1.4"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_90_8">
-                      <rect
-                        width="12"
-                        height="13"
-                        fill="white"
-                        transform="matrix(0 1 -1 0 13.5 0)"
+              <div
+                className="showFilters rounded-lg p-[10px_15px] cursor-pointer whitespace-nowrap w-[-webkit-fill-available] text-center bg-[var(--bg2)] flex gap-[5px] justify-center items-center "
+                onClick={() => setIsFiltersHidden(!isFiltersHidden)}
+              >
+                <p className="text-[var(--color)]">Фильтры</p>
+                {isFiltersHidden ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="12"
+                    viewBox="0 0 14 12"
+                    fill="none"
+                  >
+                    <g clip-path="url(#clip0_90_8)">
+                      <path
+                        d="M11.582 6.26953L6.99906 10.5L2.41609 6.26953"
+                        stroke="var(--color)"
+                        strokeWidth="1.4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
                       />
-                    </clipPath>
-                  </defs>
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="12"
-                  viewBox="0 0 14 12"
-                  fill="none"
-                >
-                  <g clip-path="url(#clip0_90_8)">
-                    <path
-                      d="M11.582 5.73047L6.99906 1.50004L2.41609 5.73047"
-                      stroke="var(--color)"
-                      strokeWidth="1.4"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M7 1.50005L7 10.5"
-                      stroke="var(--color)"
-                      strokeWidth="1.4"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_90_8">
-                      <rect
-                        width="12"
-                        height="13"
-                        fill="white"
-                        transform="matrix(0 -1 -1 0 13.5 12)"
+                      <path
+                        d="M7 10.5L7 1.5"
+                        stroke="var(--color)"
+                        strokeWidth="1.4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
                       />
-                    </clipPath>
-                  </defs>
-                </svg>
-              )}
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_90_8">
+                        <rect
+                          width="12"
+                          height="13"
+                          fill="white"
+                          transform="matrix(0 1 -1 0 13.5 0)"
+                        />
+                      </clipPath>
+                    </defs>
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="12"
+                    viewBox="0 0 14 12"
+                    fill="none"
+                  >
+                    <g clip-path="url(#clip0_90_8)">
+                      <path
+                        d="M11.582 5.73047L6.99906 1.50004L2.41609 5.73047"
+                        stroke="var(--color)"
+                        strokeWidth="1.4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M7 1.50005L7 10.5"
+                        stroke="var(--color)"
+                        strokeWidth="1.4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_90_8">
+                        <rect
+                          width="12"
+                          height="13"
+                          fill="white"
+                          transform="matrix(0 -1 -1 0 13.5 12)"
+                        />
+                      </clipPath>
+                    </defs>
+                  </svg>
+                )}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-) }
-
-
-
+          )}
+        </div>
+      )}
 
       <div className="flex flex-col gap-[30px] p-[20px] ">
         {tendersLoader ? (
           <div className="m-auto">
             <Loader isFull={false} color="var(--main)" />
           </div>
-        )  : filteredTenders.length === 0 ? (
+        ) : !isSubscribed ? (
+          <a
+            className={`block p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
+    bg-[var(--main)]/90 cursor-pointer hover:bg-[var(--main)] mt-[10px] m-auto`}
+            href="/pro"
+          >
+            Оформить подписку
+          </a>
+        ) : filteredTenders.length === 0 ? (
           <p className="text-[24px] text-center">
             К сожалению, по данным фильтрам тендера не найдены :(
+            <br />
+            {filters.platform === "" && filters.status === "" ? (
+              <p className=" text-center">
+                Кажется, вы не заполнили фильтры в настройках. Без них наш ИИ не
+                сможет подбирать для Вас тендера. 
+                <a
+                  class="block p-[7px_15px] w-fit rounded-xl text-white justify-center whitespace-nowrap
+    bg-[var(--main)]/90 cursor-pointer hover:bg-[var(--main)] mt-[10px] m-auto"
+                  href="/settings#filters"
+                >
+                  Настроить фильтры
+                </a>
+              </p>
+            ) : (
+              ""
+            )}
           </p>
         ) : filteredTenders.length !== 0 ? (
           <div className=" ">
@@ -888,10 +920,15 @@ bg-[var(--clean)]/20 hover:bg-[var(--clean)]/50  ${
                         </p>
                       </div>
                       <div className="flex flex-col">
-                        <p className=" text-xl font-extrabold">
-                          {getFinalAmount(item.lots)}{" "}
-                          {item.lots[0].currency || "BYN"}
-                        </p>
+                        {item.lots.length === 1 &&
+                        item.lots[0].price === null ? (
+                          "Цена не указана"
+                        ) : (
+                          <p className=" text-xl font-extrabold">
+                            {formatNumberWithSpaces(getFinalAmount(item.lots))}{" "}
+                            {item.lots[0].currency || "BYN"}
+                          </p>
+                        )}
                       </div>
 
                       <div className="flex gap-[5px] items-center">

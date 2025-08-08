@@ -9,7 +9,9 @@ import ErrorPopup from "../../Components/ErrorPopup/ErrorPopup";
 import { notify } from "../../utils/notify";
 import { tryProtectedRequest } from "../../utils/tryProtectedRequest";
 import Regions from "./Components/Regions";
+import EditableField from './Components/EditableField'
 import ThemeToggler from "../../Components/Sidebar/Components/ThemeToggler/ThemeToggler";
+import CurrentPlan from "./Components/CurrentPlan";
 
 export default function Settings({ refreshToken }) {
   const { userInfo, error, setError, refreshUserInfo } =
@@ -46,7 +48,7 @@ export default function Settings({ refreshToken }) {
       setInitialFilters(userInfo.filter);
     }
   }, [userInfo]);
- 
+
   const isFiltersChanged =
     JSON.stringify(filters) !== JSON.stringify(initialFilters);
 
@@ -408,11 +410,12 @@ export default function Settings({ refreshToken }) {
                 </button>
               </div>
             </div>
+<CurrentPlan plan={userInfo.subscription} remaining_days={userInfo.remaining_days}/>
           </div>
 
-<div className="bg-[var(--bg2)] p-5 rounded-lg">
-          <Regions refreshToken={refreshToken}  />
-</div>
+          <div className="bg-[var(--bg2)] p-5 rounded-lg">
+            <Regions refreshToken={refreshToken} />
+          </div>
           {/* <div className="flex flex-col gap-4">
             <p className="text-2xl font-medium">Выбранные платформы</p>
             <div className="flex flex-wrap gap-4">
@@ -482,7 +485,7 @@ export default function Settings({ refreshToken }) {
           </div> */}
 
           {filterSum !== "" ? (
-            <div className="flex flex-col gap-[30px] bg-[var(--bg2)] p-5 rounded-lg col-span-2">
+            <div id="filters" className="flex flex-col gap-[30px] bg-[var(--bg2)] p-5 rounded-lg col-span-2">
               <p className="text-3xl font-medium ">Фильтр</p>
               <div className="flex flex-col gap-[10px]">
                 {Object.entries(filters).map(([key, value]) => (
@@ -498,15 +501,21 @@ export default function Settings({ refreshToken }) {
                       }
                     /> */}
 
-
-                    <textarea
-                    className="outline-0 input_comp auth_input w-full rounded-lg bg-[var(--input)] pr-[20px] pl-[20px] pt-[10px] pb-[10px] border  border-transparent
+                    {/* <textarea
+                    className="outline-0  input_comp auth_input w-full rounded-lg bg-[var(--input)] pr-[20px] pl-[20px] pt-[10px] pb-[10px] border  border-transparent
  focus-visible:border-[var(--main)]  focus-visible:bg-[var(--main)]/10 shadow-[0px_0px_8px_0px_rgba(0,_0,_0,_0.1)]"
                      onChange={(e) =>
                         setFilters({ ...filters, [key]: e.target.value })
                       }
                       
-                    name="" id="">{value}</textarea>
+                    name="" id="">{value}</textarea> */}
+
+                    <EditableField
+                      value={filters[key]}
+                      onChange={(newValue) =>
+                        setFilters({ ...filters, [key]: newValue })
+                      }
+                    />
                   </div>
                 ))}
               </div>
@@ -541,7 +550,7 @@ export default function Settings({ refreshToken }) {
       ) : (
         <Loader isFull={true} />
       )}
-            <ThemeToggler isDark={isDark}/>
+      <ThemeToggler isDark={isDark} />
 
       {addInfo && (
         <div className="absolute top-0 right-0 left-0 bottom-0 backdrop-blur-xs bg-[var(--main)]/50 dark:bg-[var(--main)]/10 z-99 h-screen flex ">

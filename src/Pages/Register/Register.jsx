@@ -8,10 +8,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { notify } from "../../utils/notify";
 import Marquee from "react-fast-marquee";
 import { useLogout } from "../../hooks/useLogout";
+import { Checkbox, Flex, Text } from "@radix-ui/themes";
 
 export default function Register() {
   const [error, setError] = useState("");
-  const [cookies, setCookie, removeCookie] = useCookies(["auth_token", "user_email"]);
+  const [cookies, setCookie, removeCookie] = useCookies([
+    "auth_token",
+    "user_email",
+  ]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -22,7 +26,7 @@ export default function Register() {
     unp: "",
   });
 
-  const logout = useLogout()
+  const logout = useLogout();
 
   const handleSubmit = async (e) => {
     setLoading(true);
@@ -42,32 +46,33 @@ export default function Register() {
       );
       const data = await response.json();
       if (response.ok) {
-
-        setCookie("auth_token", data.access_token, { path: "regius_tenders/", maxAge: 3600 });
-             setCookie("refresh_token", data.refresh_token, {
-          path: "regius_tenders/",
+        setCookie("auth_token", data.access_token, {
+          path: "/",
+          maxAge: 3600,
+        });
+        setCookie("refresh_token", data.refresh_token, {
+          path: "/",
           maxAge: 86400,
         });
 
-        logout()
+        logout();
       } else {
         // setError("Ошибка регистрации: " + data.detail);
 
-            notify({
-            title: "Ошибка",
-            message: "Ошибка регистрации: " + data.detail,
-            type: "danger",
-          });
+        notify({
+          title: "Ошибка",
+          message: "Ошибка регистрации: " + data.detail,
+          type: "danger",
+        });
       }
     } catch (err) {
       // setError("Ошибка регистрации ");
 
-         notify({
-            title: "Ошибка",
-            message: "Ошибка регистрации ",
-            type: "danger",
-          });
-      
+      notify({
+        title: "Ошибка",
+        message: "Ошибка регистрации ",
+        type: "danger",
+      });
     } finally {
       setLoading(false);
     }
@@ -78,7 +83,7 @@ export default function Register() {
     <div className="auth flex h-screen w-screen overflow-hidden relative">
       {error !== "" && <ErrorPopup errText={error} setError={setError} />}
       {loading && <Loader isFull={true} />}
-       <div className=" z-0 w-screen absolute text-[#D2E3C8] text-[300px] md:text-[200px]  lg:text-[300px]  max-[768px]:text-[100px] font-black leading-60 md:leading-40 lg:leading-60 max-[768px]:leading-20 transform-[translate(-50%,-50%)]  top-[50%] left-[50%] bg-[var(--bg2)] ">
+      <div className=" z-0 w-screen absolute text-[#D2E3C8] text-[300px] md:text-[200px]  lg:text-[300px]  max-[768px]:text-[100px] font-black leading-60 md:leading-40 lg:leading-60 max-[768px]:leading-20 transform-[translate(-50%,-50%)]  top-[50%] left-[50%] bg-[var(--bg2)] ">
         {backDeco.map((item, index) => (
           <div key={index}>
             <Marquee
@@ -172,11 +177,15 @@ export default function Register() {
               setFormData({ ...formData, phone_number: e.target.value })
             }
           />
-
+          <Text as="label" size="2">
+            <Flex as="span" gap="2">
+              <Checkbox required size="1" color="var(--main)" defaultChecked /> <div className="inline">Регистрируясь в системе и оставляя данные на сайте, вы соглашаетесь на обработку персональных данных в соответствии с <Link className="text-[var(--main)] hover:underline" to="privacy">Политикой конфиденциальности</Link> .</div> 
+            </Flex>
+          </Text>
           <input
             type="submit"
             className="button auth_submit w-fit m-auto pl-[40px] pr-[40px] pt-[20px] pb-[20px] bg-[var(--main)]/80 border-2  border-transparent cursor-pointer rounded-md text-white uppercase text-xl hover:bg-transparent hover:border-2 hover:border-[var(--main)]/80 hover:text-[var(--main)]/80 big-button"
-            value={'Зарегистрироваться'}
+            value={"Зарегистрироваться"}
           />
 
           <Link
@@ -187,6 +196,12 @@ export default function Register() {
           </Link>
         </form>
       </div>
+         <Link
+        className="absolute bottom-0 hover:text-[var(--main)] left-0 rounded-lg text-xs opacity-75 px-2 py-0.5 bg-[var(--bg)]"
+        to="privacy"
+      >
+        Политика конфиденциальности
+      </Link>
     </div>
   );
 }

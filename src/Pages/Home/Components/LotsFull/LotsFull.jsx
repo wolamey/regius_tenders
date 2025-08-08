@@ -33,7 +33,10 @@ export default function LotsFull({ lots, setShowFull }) {
             >
               <span>{lot.id}</span>
               <span>{lot.name}</span>
-              <span className="pl-2">{lot.quantity}</span>
+              <span className="pl-2"> 
+
+                {lot.quantity === null ? 'не указано': lot.quantity}
+                </span>
               <span className=" font-medium  whitespace-nowrap">
                 {lot.price} {lot.currency}
               </span>

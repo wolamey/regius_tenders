@@ -106,7 +106,9 @@ body.blue.dark  {
 .rt-SwitchRoot:where(.rt-variant-surface)::before{
   background-image: linear-gradient(to right, var(--main) 40%, transparent 60%);
 }
-
+.rt-BaseCheckboxRoot:where(.rt-variant-surface):where([data-state='checked'], [data-state='indeterminate'])::before{
+  background-color: var(--main);
+}
 
 .search_input{
   background-image: url(/src/assets/images/search.svg) ;

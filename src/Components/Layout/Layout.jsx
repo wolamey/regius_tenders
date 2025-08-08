@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../Sidebar/Sidebar";
 import UserInfoLine from "../UserInfoLine/UserInfoLine";
+import { Link } from "react-router-dom";
 
 const Layout = ({ children, pageName,refreshToken }) => {
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
@@ -44,6 +45,13 @@ const Layout = ({ children, pageName,refreshToken }) => {
         />
         <div className="h-full flex flex-col overflow-x-hidden overflow-y-auto w-full   mx-auto max-w-[1400px] ">{children}</div>
       </div>
+
+         <a
+        className="absolute bottom-0 hover:text-[var(--main)] left-0 rounded-lg text-xs opacity-75 px-2 py-0.5 bg-[var(--bg)]"
+        href="/privacy"
+      >
+        Политика конфиденциальности
+      </a>
     </div>
   );
 };
