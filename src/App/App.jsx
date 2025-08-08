@@ -14,6 +14,10 @@ import Privacy from "../Pages/Privacy/Privacy";
 
 // Компонент для подгрузки Bitrix24-чата
 const BitrixScript = () => {
+
+
+
+
   useEffect(() => {
     const selector =
       'script[src^="https://cdn-ru.bitrix24.by/b30573366/crm/site_button/loader_4_myjcfv.js"]';
@@ -39,6 +43,11 @@ const BitrixScript = () => {
 };
 
 const App = () => {
+
+
+  
+
+
   const [cookies, setCookie] = useCookies([
     "auth_token",
     "refresh_token",

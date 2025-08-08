@@ -104,6 +104,77 @@ export default function Sidebar({
       link: "/pro",
     },
   ];
+
+  const tabs2 = [
+    {
+      image: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="25"
+          height="25"
+          viewBox="0 0 25 25"
+          fill="none"
+        >
+          <path
+            d="M23.125 16.6718H19.4844C17.9311 16.6718 16.6719 17.931 16.6719 19.4843V23.125M23.125 16.6718C23.125 17.2564 23.0099 17.8352 22.7862 18.3752C22.5625 18.9153 22.2346 19.406 21.8213 19.8193L19.8193 21.8212C19.406 22.2346 18.9153 22.5625 18.3753 22.7861C17.8352 23.0098 17.2564 23.125 16.6719 23.125M23.125 16.6718V5.69454C23.125 4.44947 22.6304 3.25539 21.75 2.37498C20.8696 1.49461 19.6755 1.00002 18.4305 1H5.69453C4.44947 1.00002 3.2554 1.49461 2.37498 2.37498C1.49461 3.25539 1.00002 4.44947 1 5.69454V18.4304C1.00002 19.6755 1.49461 20.8696 2.37498 21.75C3.2554 22.6304 4.44947 23.1249 5.69453 23.125H16.6719M6.53125 17.5937H12.0625M6.53125 6.53126C6.53125 6.53126 13.2735 6.53126 17.5937 6.53126M6.53125 12.0625H17.5937"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      ),
+      name: "Список закупок",
+      link: "/",
+    },
+
+    {
+      image: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="27"
+          height="25"
+          viewBox="0 0 27 25"
+          fill="none"
+        >
+          <path
+            d="M16.5493 14.1494L15.3334 10.8467C15.0587 10.1006 14.3415 9.5684 13.5 9.5684C12.6585 9.5684 11.9413 10.1006 11.6665 10.8467L10.4506 14.1494C10.1758 14.8956 9.45867 15.4278 8.61717 15.4278C7.77567 15.4278 7.05848 14.8956 6.78373 14.1494L5.76312 10.8467C5.48832 10.1006 4.77118 9.5684 3.92968 9.5684C2.85102 9.5684 1.97656 10.4428 1.97656 11.5215V21.2871C1.97656 22.3658 2.85102 23.2402 3.92968 23.2402H23.0703C24.149 23.2402 25.0234 22.3658 25.0234 21.2871V11.5215C25.0234 10.4428 24.149 9.5684 23.0703 9.5684C22.2287 9.5684 21.5116 10.1006 21.2368 10.8467L20.2162 14.1494C19.9415 14.8956 19.2243 15.4278 18.3828 15.4278C17.5412 15.4278 16.8241 14.8956 16.5493 14.1494Z"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-miterlimit="10"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M5.8828 3.70899C5.8828 4.78765 5.00834 5.66211 3.92968 5.66211C2.85102 5.66211 1.97656 4.78765 1.97656 3.70899C1.97656 2.63033 2.85102 1.75587 3.92968 1.75587C5.00834 1.75587 5.8828 2.63033 5.8828 3.70899Z"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-miterlimit="10"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M15.4531 3.70899C15.4531 4.78765 14.5787 5.66211 13.5 5.66211C12.4213 5.66211 11.5468 4.78765 11.5468 3.70899C11.5468 2.63033 12.4213 1.75587 13.5 1.75587C14.5787 1.75587 15.4531 2.63033 15.4531 3.70899Z"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-miterlimit="10"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M25.0234 3.70899C25.0234 4.78765 24.149 5.66211 23.0702 5.66211C21.9915 5.66211 21.1171 4.78765 21.1171 3.70899C21.1171 2.63033 21.9915 1.75587 23.0702 1.75587C24.149 1.75587 25.0234 2.63033 25.0234 3.70899Z"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-miterlimit="10"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      ),
+      name: "PRO",
+      link: "/pro",
+    },
+  ];
+
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
   const path = location.pathname;
@@ -162,18 +233,41 @@ export default function Sidebar({
           <p className="text-3xl text-white mb-[40px]">{pageName}</p>
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-[10px] sidebar_item">
-              {tabs.map((item, index) => (
-                <Link
-                  to={item.link}
-                  className={`${
-                    path === item.link ? "active  bg-[var(--bg)]/20 " : " hover:bg-[var(--bg)]/15"
-                  } tab_item rounded-lg  flex gap-[12px] items-center p-[10px_20px]   `}
-                  key={index}
-                >
-                  {item.image}
-                  <p className=" whitespace-nowrap text-[18px] ">{item.name}</p>
-                </Link>
-              ))}
+              {userInfo && userInfo.has_access
+                ? tabs.map((item, index) => (
+                    <Link
+                      to={item.link}
+                      className={`${
+                        path === item.link
+                          ? "active  bg-[var(--bg)]/20 "
+                          : " hover:bg-[var(--bg)]/15"
+                      } tab_item rounded-lg  flex gap-[12px] items-center p-[10px_20px]   `}
+                      key={index}
+                    >
+                      {item.image}
+                      <p className=" whitespace-nowrap text-[18px] ">
+                        {item.name}
+                      </p>
+                    </Link>
+                  ))
+                : tabs2.map((item, index) => (
+                    <Link
+                      to={item.link}
+                      className={`${
+                        path === item.link
+                          ? "active  bg-[var(--bg)]/20 "
+                          : " hover:bg-[var(--bg)]/15"
+                      } tab_item rounded-lg  flex gap-[12px] items-center p-[10px_20px]   `}
+                      key={index}
+                    >
+                      {item.image}
+                      <p className=" whitespace-nowrap text-[18px] ">
+                        {item.name}
+                      </p>
+                    </Link>
+                  ))}
+
+          
             </div>
 
             <DayNightToggler />

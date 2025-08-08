@@ -12,11 +12,17 @@ import Regions from "./Components/Regions";
 import EditableField from './Components/EditableField'
 import ThemeToggler from "../../Components/Sidebar/Components/ThemeToggler/ThemeToggler";
 import CurrentPlan from "./Components/CurrentPlan";
+import { useNavigate } from "react-router-dom";
 
 export default function Settings({ refreshToken }) {
+
+  const navigate = useNavigate()
+
   const { userInfo, error, setError, refreshUserInfo } =
     useUserInfo(refreshToken);
   if (error) setError(error);
+
+  if(!userInfo.has_access) navigate('/pro')
 
   const logout = useLogout();
 
